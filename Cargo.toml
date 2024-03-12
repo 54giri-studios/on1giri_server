@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 tokio = {version = "*", features = ["full"]}
 rocket = { version = "*", features = ["secrets"] }
+rocket_ws = "0.1.0"

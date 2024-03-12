@@ -10,8 +10,8 @@ pub use delete::{delete_by_id, delete_by_username_discriminator};
 mod patch;
 
 pub enum Permission {
-    ADMIN,
-    REGULAR,
+    Admin,
+    Regular,
 }
 
 pub struct User {
