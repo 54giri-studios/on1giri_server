@@ -9,20 +9,6 @@ pub use delete::{delete_by_id, delete_by_username_discriminator};
 
 mod patch;
 
-pub enum Permission {
-    Admin,
-    Regular,
-}
-
-pub struct User {
-    id: i64,
-    password_hash: String,
-    user_type: Permission,
-    email: String,
-}
-
-
-
 /// Return all routes associated to the current folder
 pub fn routes() -> Vec<Route> {
     let mut routes = Vec::new();

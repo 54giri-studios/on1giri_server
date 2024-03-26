@@ -1,17 +1,12 @@
 #[macro_use] extern crate rocket;
-
-use std::collections::HashMap;
-
-use rocket::{tokio::sync::Mutex, Build, Rocket};
-
-pub mod routes;
-pub mod server;
+mod users;
+mod gateway;
 
 #[launch]
-pub fn rocket() -> Rocket<Build> {
+fn rocket() -> _ {
     rocket::build()
-        .manage(server::AppState{
-            clients: Mutex::new(HashMap::new()),
-        })
-        .mount("/", routes![routes::subscribe, routes::publish])
+        .mount("/users/", users::routes())
+        .mount("/gateway/", gateway::routes())
 }
+
+
