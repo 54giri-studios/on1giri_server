@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+diesel = { version = "*", features = ["postgres", "r2d2"] }
 tokio = {version = "*", features = ["full"]}
 rocket = { version = "*", features = ["secrets", "json"] }
 rocket_ws = "0.1.0"
+

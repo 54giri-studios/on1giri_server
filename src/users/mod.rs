@@ -1,23 +1,24 @@
 //! Functions / Routes used interact with user data
+mod routes;
+pub use routes::*;
+
+mod types;
+pub use types::*;
+
+mod schema;
+pub use schema::*;
+
 use rocket::Route;
 
-mod get;
-pub use get::{get_by_id, get_by_username_discriminator};
-
-mod delete;
-pub use delete::{delete_by_id, delete_by_username_discriminator};
-
-mod patch;
-
-/// Return all routes associated to the current folder
 pub fn routes() -> Vec<Route> {
-    let mut routes = Vec::new();
+    routes![
+        get_by_id,
+        get_by_username_discriminator,
 
-    let get_routes = routes![get_by_id, get_by_username_discriminator];
-    routes.extend(get_routes);
+        delete_by_id,
+        delete_by_username_discriminator,
 
-    let delete_routes = routes![delete_by_id, delete_by_username_discriminator];
-    routes.extend(delete_routes);
-
-    routes
+        update_by_id,
+        update_by_username_discriminator,
+    ]
 }
