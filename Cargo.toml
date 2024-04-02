@@ -10,4 +10,5 @@ diesel = { version = "*", features = ["postgres", "r2d2"] }
 tokio = {version = "*", features = ["full"]}
 rocket = { version = "*", features = ["secrets", "json"] }
 rocket_ws = "0.1.0"
+serde = { version = "*", features = ["derive", "std"]}
 

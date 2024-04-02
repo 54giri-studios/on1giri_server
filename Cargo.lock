@@ -845,6 +845,7 @@ dependencies = [
  "diesel",
  "rocket",
  "rocket_ws",
+ "serde",
  "tokio",
 ]
 
