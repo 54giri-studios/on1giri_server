@@ -1,12 +1,16 @@
 //! Functions / routes used to retrieve informations about users
 
+use rocket::State;
+
+use crate::DbPool;
+
 /// Gets an user from its id
 /// 
 /// # Arguments
 /// * `id` - The user's unique identifier
 #[get("/<id>")]
-pub async fn get_by_id(id: i64) {
-    todo!()
+pub async fn get_by_id(pool: &State<DbPool>, id: i64) {
+
 }
 
 /// Gets an user using it's name and discriminator
