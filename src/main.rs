@@ -12,6 +12,7 @@ use diesel_async::{
     AsyncPgConnection,
     RunQueryDsl
 };
+use gateway::SubscriptionState;
 
 use std::env;
 
@@ -30,14 +31,15 @@ pub use users::{User, UserMetadata};
 mod roles;
 pub use roles::Role;
 
-type DbPool = AsyncDieselConnectionManager<AsyncPgConnection>;
+type Db = AsyncDieselConnectionManager<AsyncPgConnection>;
+type DbPool = Pool<AsyncPgConnection>;
 
 mod gateway;
 
-fn establish_db_connection() -> Pool<AsyncPgConnection> {
+fn establish_db_connection() -> DbPool {
     dotenvy::dotenv().ok();
     
-    let config = DbPool::new(
+    let config = Db::new(
         std::env::var("DATABASE_URL")
             .unwrap_or_else(|_| panic!("DATABASE_URL env var must be set"))
     );
@@ -51,9 +53,11 @@ fn establish_db_connection() -> Pool<AsyncPgConnection> {
 #[launch]
 async fn rocket() -> _ {
     let mut pool = establish_db_connection();
+    let mut subscriptions = SubscriptionState::new();
 
     rocket::build()
         .manage(pool)
+        .manage(subscriptions)
         .mount("/users/", users::routes())
         .mount("/gateway/", gateway::routes())
 }
