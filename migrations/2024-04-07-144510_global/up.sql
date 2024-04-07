@@ -1,11 +1,17 @@
 -- Your SQL goes here
 
 -- Users
+
+CREATE TABLE "access_levels" (
+    "level" VARCHAR NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE "users"(
 	"id" INT4 NOT NULL PRIMARY KEY,
 	"password" VARCHAR NOT NULL,
-	"user_type" INT4 NOT NULL,
-	"email" VARCHAR NOT NULL
+	"access_level" VARCHAR NOT NULL,
+	"email" VARCHAR NOT NULL,
+    FOREIGN KEY ("access_level") REFERENCES "access_levels" ("level")
 );
 
 CREATE TABLE "users_metadata"(

@@ -59,6 +59,10 @@ async fn rocket() -> _ {
         }
     };
 
+    if let Err(err) = users::setup(&pool).await {
+        panic!("Error setting up the overlord {err}");
+    };
+
     let mut subscriptions = SubscriptionState::new();
 
     rocket::build()
@@ -67,5 +71,3 @@ async fn rocket() -> _ {
         .mount("/users/", users::routes())
         .mount("/gateway/", gateway::routes())
 }
-
-
