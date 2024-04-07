@@ -5,9 +5,6 @@ pub use routes::*;
 mod types;
 pub use types::*;
 
-mod schema;
-pub use schema::*;
-
 use rocket::Route;
 
 pub fn routes() -> Vec<Route> {

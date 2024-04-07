@@ -5,8 +5,7 @@
 
 use diesel_async::{
     pooled_connection::{
-        AsyncDieselConnectionManager,
-        deadpool::Pool
+        deadpool::{BuildError, Pool}, AsyncDieselConnectionManager, PoolError
     },
     AsyncConnection, 
     AsyncPgConnection,
@@ -14,7 +13,8 @@ use diesel_async::{
 };
 use gateway::SubscriptionState;
 
-use std::env;
+use core::panic;
+use std::{env, error::Error};
 
 mod channels;
 pub use channels::Channel;
@@ -36,7 +36,9 @@ type DbPool = Pool<AsyncPgConnection>;
 
 mod gateway;
 
-fn establish_db_connection() -> DbPool {
+pub mod schema; 
+
+fn establish_db_connection() -> Result<DbPool, BuildError> {
     dotenvy::dotenv().ok();
     
     let config = Db::new(
@@ -44,15 +46,19 @@ fn establish_db_connection() -> DbPool {
             .unwrap_or_else(|_| panic!("DATABASE_URL env var must be set"))
     );
 
-    Pool::builder(config)
-        .build()
-        .unwrap()
+    Pool::builder(config).build()
 }
 
 
 #[launch]
 async fn rocket() -> _ {
-    let mut pool = establish_db_connection();
+    let mut pool = match establish_db_connection() {
+        Ok(p) => p,
+        Err(err) => {
+            panic!("Failed to connect to the database: {err}");
+        }
+    };
+
     let mut subscriptions = SubscriptionState::new();
 
     rocket::build()
