@@ -1,0 +1,13 @@
+// extension REST client
+
+### TEST1
+POST http://127.0.0.1:8000/messages/0
+Content-Type: application/json
+
+{"id":42, "channel_id":0, "author_id":1515, "content":"bonjour", "creation_date":"2019-10-12T07:20:50.52Z"}
+
+### TEST2
+GET http://127.0.0.1:8000/messages/0/42
+
+
+
