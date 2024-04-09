@@ -29,7 +29,7 @@ impl<'a> AccessLevel<'a> {
 }
 
 
-#[derive(Debug, Queryable, Selectable, Insertable)]
+#[derive(Debug, Queryable, Selectable, Insertable, Serialize)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User<'a> {
