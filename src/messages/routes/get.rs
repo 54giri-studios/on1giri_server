@@ -18,8 +18,7 @@ pub async fn get_message(pool: &State<DbPool>,channel_id: i32, message_id: i32) 
 
     use crate::schema::messages;
 
-    // let m = messages::table.load::<Message>(&mut conn).await;
-
+    let m = messages::table.load::<Message>(&mut conn).await;
 
     todo!()
 

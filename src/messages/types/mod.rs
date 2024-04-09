@@ -1,12 +1,12 @@
 use std::borrow::Cow;
 
 use chrono::{DateTime, Utc};
-use diesel::{deserialize::FromSqlRow, prelude::Insertable, Selectable};
+use diesel::{deserialize::{FromSqlRow, Queryable}, prelude::Insertable, Selectable};
 use rocket::{data::{self, FromData}, Request, Data};
 
 use crate::User;
 
-#[derive(Serialize, Deserialize, Debug, Selectable, Insertable)]
+#[derive(Serialize, Deserialize, Debug, Selectable, Insertable, Queryable)]
 #[diesel(table_name = crate::schema::messages)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Message<'a> {
