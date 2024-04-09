@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
+use rocket::{data::{self, FromData}, Request, Data};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Message {
     id: i32,
     channel_id: i32,

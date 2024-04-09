@@ -13,7 +13,6 @@ use diesel_async::{
 };
 use gateway::SubscriptionState;
 
-use core::panic;
 use std::{env, error::Error};
 
 mod channels;
@@ -68,6 +67,7 @@ async fn rocket() -> _ {
     rocket::build()
         .manage(pool)
         .manage(subscriptions)
-        .mount("/users/", users::routes())
         .mount("/gateway/", gateway::routes())
+        .mount("/messages/", messages::routes())
+        .mount("/users/", users::routes())
 }
