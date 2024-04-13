@@ -17,7 +17,6 @@ diesel::table! {
         id -> Int4,
         guild_id -> Int4,
         name -> Varchar,
-        kind -> Varchar,
     }
 }
 
@@ -70,7 +69,6 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(channels -> channel_kinds (kind));
 diesel::joinable!(channels -> guilds (guild_id));
 diesel::joinable!(guilds -> users (owner_id));
 diesel::joinable!(messages -> channels (channel_id));

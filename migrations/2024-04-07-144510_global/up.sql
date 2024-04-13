@@ -52,9 +52,7 @@ CREATE TABLE "channels"(
 	"id" SERIAL PRIMARY KEY,
 	"guild_id" INT4 NOT NULL,
 	"name" VARCHAR NOT NULL,
-	"kind" VARCHAR NOT NULL,
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id"),
-    FOREIGN KEY ("kind") REFERENCES "channel_kinds" ("kind")
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
 );
 
 -- Messages
