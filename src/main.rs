@@ -13,6 +13,7 @@ use diesel_async::{
 };
 use gateway::SubscriptionState;
 
+use core::panic;
 use std::{env, error::Error};
 
 mod channels;
@@ -60,6 +61,10 @@ async fn rocket() -> _ {
 
     if let Err(err) = users::setup(&pool).await {
         panic!("Error setting up the overlord {err}");
+    };
+
+    if let Err(err) = guilds::setup(&pool).await {
+        panic!("Error setting up the system guild {err}");
     };
 
     let mut subscriptions = SubscriptionState::new();

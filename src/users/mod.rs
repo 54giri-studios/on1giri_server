@@ -11,19 +11,6 @@ use rocket::{http::hyper::server::conn::AddrIncoming, Route};
 
 use crate::{schema::users::access_level, users, DbPool};
 
-pub fn routes() -> Vec<Route> {
-    routes![
-        get_by_id,
-        get_by_username_discriminator,
-
-        delete_by_id,
-        delete_by_username_discriminator,
-
-        update_by_id,
-        update_by_username_discriminator,
-    ]
-}
-
 pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
     let mut connection = pool.get().await?;
 
@@ -49,7 +36,7 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
     };
 
     use crate::schema::users::{self, id};
-    let returned = diesel::insert_into(users::table)
+    diesel::insert_into(users::table)
         .values(&overlord)
         .on_conflict(id)
         .do_nothing()

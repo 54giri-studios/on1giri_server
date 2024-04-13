@@ -39,6 +39,15 @@ pub struct User<'a> {
     pub email: Cow<'a, str>
 }
 
+#[derive(Debug, Deserialize, Insertable)]
+#[diesel(table_name = crate::schema::users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct NewUser<'a> {
+    pub password: Cow<'a, str>,
+    pub access_level: Cow<'a, str>,
+    pub email: Cow<'a, str>
+}
+
 #[derive(Debug, Queryable, Insertable)]
 #[diesel(table_name = crate::schema::users_metadata)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -51,4 +60,3 @@ pub struct UserMetadata {
     account_creation: chrono::DateTime<Utc>,
     description: String
 }
-

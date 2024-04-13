@@ -1,6 +1,9 @@
+use diesel::{deserialize::Queryable, prelude::Insertable};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
+#[diesel(table_name = crate::schema::roles)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Role {
     id: i32,
     guild_id: i32,
