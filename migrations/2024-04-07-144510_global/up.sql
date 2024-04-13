@@ -43,6 +43,14 @@ CREATE TABLE "roles"(
     FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
 );
 
+CREATE TABLE "members" (
+	"user_id" INT4 NOT NULL,
+	"guild_id" INT4 NOT NULL,
+	PRIMARY KEY ("user_id", "guild_id"),
+	FOREIGN KEY ("user_id") REFERENCES "users" ("id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+);
+
 -- Channels
 CREATE TABLE "channel_kinds" (
     "kind" VARCHAR NOT NULL PRIMARY KEY
@@ -52,7 +60,9 @@ CREATE TABLE "channels"(
 	"id" SERIAL PRIMARY KEY,
 	"guild_id" INT4 NOT NULL,
 	"name" VARCHAR NOT NULL,
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+	"kind" VARCHAR NOT NULL,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id"),
+	FOREIGN KEY ("kind") REFERENCES "channel_kinds" ("kind")
 );
 
 -- Messages
@@ -64,6 +74,7 @@ CREATE TABLE "messages"(
 	"creation_date" TIMESTAMPTZ NOT NULL,
 	PRIMARY KEY("id", "channel_id"),
     FOREIGN KEY ("channel_id") REFERENCES "channels" ("id"),
+	-- Can't reference a member as someone can join then leave
     FOREIGN KEY ("author_id") REFERENCES "users" ("id")
 );
 

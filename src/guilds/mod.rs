@@ -3,6 +3,9 @@ use chrono::{DateTime, Utc};
 use diesel_async::RunQueryDsl;
 pub use types::*;
 
+mod routes;
+pub use routes::routes;
+
 use crate::DbPool;
 
 pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {

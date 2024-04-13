@@ -21,6 +21,8 @@ pub use channels::Channel;
 mod guilds;
 pub use guilds::Guild;
 
+mod members;
+
 mod messages;
 pub use messages::Message;
 
@@ -77,6 +79,8 @@ async fn rocket() -> _ {
         .manage(pool)
         .manage(subscriptions)
         .mount("/gateway/", gateway::routes())
+        .mount("/guilds/", guilds::routes())
+        .mount("/channels/", channels::routes())
         .mount("/messages/", messages::routes())
         .mount("/users/", users::routes())
 }

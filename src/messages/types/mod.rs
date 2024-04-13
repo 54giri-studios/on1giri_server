@@ -6,7 +6,37 @@ use rocket::{data::{self, FromData}, Request, Data};
 
 use crate::User;
 
-#[derive(Serialize, Deserialize, Debug, Selectable, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable)]
+#[diesel(table_name = crate::schema::messages)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct NewMessage<'a> {
+    channel_id: i32,
+    author_id: i32,
+    content: Cow<'a, str>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Insertable)]
+#[diesel(table_name = crate::schema::messages)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct InsertableMessage<'a> {
+    channel_id: i32,
+    author_id: i32,
+    content: Cow<'a, str>,
+    creation_date: DateTime<Utc>
+}
+
+impl<'a> InsertableMessage<'a> {
+    pub fn new(msg: NewMessage<'a>) -> Self {
+        Self {
+            channel_id: msg.channel_id,
+            author_id: msg.author_id,
+            content: msg.content,
+            creation_date: Utc::now()
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Queryable, Selectable)]
 #[diesel(table_name = crate::schema::messages)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Message<'a> {
@@ -16,3 +46,4 @@ pub struct Message<'a> {
     content: Cow<'a, str>,
     creation_date: DateTime<Utc>
 }
+

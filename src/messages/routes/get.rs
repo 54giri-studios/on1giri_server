@@ -1,27 +1,30 @@
-use core::fmt;
-use std::fmt::format;
-
 use diesel::prelude::*;
 use diesel_async::{RunQueryDsl, AsyncConnection, AsyncPgConnection};
 
-use rocket::http::Status;
-use rocket::response::status::Custom;
+use rocket::{http::hyper::server::conn, response::status::NotFound};
 use rocket::serde::json::Json;
 use rocket::State;
 
 use crate::{DbPool, Message};
 
 #[get("/<channel_id>/<message_id>")]
-pub async fn get_message(pool: &State<DbPool>,channel_id: i32, message_id: i32) {
-
+pub async fn get_message<'a>(
+    pool: &State<DbPool>, 
+    channel_id: i32, 
+    message_id: i32
+) -> Json<Message<'a>>{
     let mut conn = pool.get().await.unwrap();
 
     use crate::schema::messages;
 
-    let m = messages::table.load::<Message>(&mut conn).await;
+    let message = messages::table
+        .select(Message::as_select())
+        .filter(messages::channel_id.eq(channel_id).and(messages::id.eq(message_id)))
+        .get_result(&mut conn)
+        .await
+        .unwrap();
 
-    todo!()
-
+    message.into()
 }
 
 #[get("/<channel_id>/history/<num_messages>")]
