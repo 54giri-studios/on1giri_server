@@ -7,7 +7,7 @@ CREATE TABLE "access_levels" (
 );
 
 CREATE TABLE "users"(
-	"id" INT4 NOT NULL PRIMARY KEY,
+	"id" SERIAL PRIMARY KEY,
 	"password" VARCHAR NOT NULL,
 	"access_level" VARCHAR NOT NULL,
 	"email" VARCHAR NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE "users"(
 );
 
 CREATE TABLE "users_metadata"(
-	"id" INT4 NOT NULL PRIMARY KEY,
+	"id" SERIAL PRIMARY KEY,
 	"username" VARCHAR NOT NULL,
 	"discriminator" INT2 NOT NULL,
 	"last_check_in" TIMESTAMPTZ NOT NULL,
@@ -27,14 +27,16 @@ CREATE TABLE "users_metadata"(
 
 -- Guilds
 CREATE TABLE "guilds"(
-	"id" INT4 NOT NULL PRIMARY KEY,
+	"id" SERIAL PRIMARY KEY,
 	"name" VARCHAR NOT NULL,
 	"owner_id" INT4 NOT NULL,
+	"description" TEXT NOT NULL,
+	"creation_date" TIMESTAMPTZ NOT NULL,
     FOREIGN KEY ("owner_id") REFERENCES "users" ("id")
 );
 
 CREATE TABLE "roles"(
-	"id" INT4 NOT NULL,
+	"id" SERIAL NOT NULL,
 	"guild_id" INT4 NOT NULL,
     "name" VARCHAR NOT NULL,
 	PRIMARY KEY("id", "guild_id"),
@@ -47,7 +49,7 @@ CREATE TABLE "channel_kinds" (
 );
 
 CREATE TABLE "channels"(
-	"id" INT4 NOT NULL PRIMARY KEY,
+	"id" SERIAL PRIMARY KEY,
 	"guild_id" INT4 NOT NULL,
 	"name" VARCHAR NOT NULL,
 	"kind" VARCHAR NOT NULL,
@@ -57,7 +59,7 @@ CREATE TABLE "channels"(
 
 -- Messages
 CREATE TABLE "messages"(
-	"id" INT4 NOT NULL,
+	"id" SERIAL NOT NULL,
 	"channel_id" INT4 NOT NULL,
 	"author_id" INT4 NOT NULL,
 	"content" VARCHAR NOT NULL,

@@ -26,6 +26,8 @@ diesel::table! {
         id -> Int4,
         name -> Varchar,
         owner_id -> Int4,
+        description -> Text,
+        creation_date -> Timestamptz,
     }
 }
 
