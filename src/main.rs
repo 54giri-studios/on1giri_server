@@ -12,6 +12,7 @@ use diesel_async::{
     RunQueryDsl
 };
 use gateway::SubscriptionState;
+use ring::rand::{SecureRandom, SystemRandom};
 
 use std::{env, error::Error};
 
@@ -20,6 +21,8 @@ pub use channels::Channel;
 
 mod guilds;
 pub use guilds::Guild;
+
+mod login;
 
 mod members;
 
@@ -50,6 +53,14 @@ fn establish_db_connection() -> Result<DbPool, BuildError> {
     Pool::builder(config).build()
 }
 
+fn generate_secret_key(length: usize) -> Vec<u8> {
+    let rng = SystemRandom::new();
+    let mut buffer = vec![0; length];
+    rng.fill(&mut buffer).unwrap();
+
+    buffer
+}
+
 
 #[launch]
 async fn rocket() -> _ {
@@ -74,10 +85,12 @@ async fn rocket() -> _ {
 
 
     let mut subscriptions = SubscriptionState::new();
+    let mut system_random = SystemRandom::new();
 
     rocket::build()
         .manage(pool)
         .manage(subscriptions)
+        .manage(system_random)
         .mount("/gateway/", gateway::routes())
         .mount("/guilds/", guilds::routes())
         .mount("/channels/", channels::routes())

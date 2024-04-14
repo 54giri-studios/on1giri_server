@@ -62,7 +62,6 @@ diesel::table! {
         password -> Varchar,
         access_level -> Varchar,
         email -> Varchar,
-        token -> Varchar,
     }
 }
 

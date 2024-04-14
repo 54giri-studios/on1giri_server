@@ -11,7 +11,6 @@ CREATE TABLE "users"(
 	"password" VARCHAR NOT NULL,
 	"access_level" VARCHAR NOT NULL,
 	"email" VARCHAR NOT NULL,
-	"token" VARCHAR NOT NULL,
     FOREIGN KEY ("access_level") REFERENCES "access_levels" ("level")
 );
 
