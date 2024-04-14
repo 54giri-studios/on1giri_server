@@ -28,12 +28,12 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
             .await?;
     }
 
-    let overlord = User {
-        id: 0,
-        password: "admin".into(),
-        access_level: "admin".into(), 
-        email: "admin@admin.com".into()
-    };
+    let overlord = User::new(
+            0,
+        "admin@admin.com".into(),
+    "admin".into(),
+            "admin".into()
+        );
 
     use crate::schema::users::{self, id};
     diesel::insert_into(users::table)

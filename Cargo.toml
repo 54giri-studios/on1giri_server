@@ -15,3 +15,5 @@ rocket = { version = "*", features = ["secrets", "json"] }
 rocket_ws = "0.1.0"
 dotenvy = "0.15"
 chrono = { version = "*", features = ["serde"]}
+base64 = "0.22.0"
+ring = "0.17.8"
