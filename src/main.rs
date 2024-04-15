@@ -23,6 +23,7 @@ mod guilds;
 pub use guilds::types::*;
 
 mod login;
+pub use login::types::*;
 
 mod members;
 
@@ -87,15 +88,17 @@ async fn rocket() -> _ {
 
 
     let mut subscriptions = SubscriptionState::new();
-    let mut system_random = SystemRandom::new();
+    let token_handler = TokenHandler::new()
+        .unwrap_or_else(|| panic!("Failed to generate the token handler"));
 
     rocket::build()
         .manage(pool)
         .manage(subscriptions)
-        .manage(system_random)
+        .manage(token_handler)
+        .mount("/channels/", channels::routes())
         .mount("/gateway/", gateway::routes())
         .mount("/guilds/", guilds::routes())
-        .mount("/channels/", channels::routes())
+        .mount("/login/", login::routes())
         .mount("/messages/", messages::routes())
         .mount("/users/", users::routes())
 }

@@ -17,3 +17,4 @@ dotenvy = "0.15"
 chrono = { version = "*", features = ["serde"]}
 base64 = "0.22.0"
 ring = "0.17.8"
+hex = "0.4.3"

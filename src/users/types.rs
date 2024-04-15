@@ -55,7 +55,7 @@ pub struct NewUser<'a> {
 #[diesel(table_name = crate::schema::users_metadata)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct UserMetadata {
-    id: i32,
+    pub id: i32,
     username: String,
     discriminator: i16,
     last_check_in: chrono::DateTime<Utc>,
@@ -64,15 +64,4 @@ pub struct UserMetadata {
     description: String
 }
 
-#[derive(Debug, Serialize)]
-pub struct LoggedUser<'a> {
-    pub access_level: Cow<'a, str>,
-    pub token: Cow<'a, str>,
-    pub metadata: UserMetadata
-}
-#[derive(FromForm)]
-pub struct LoginForm<'a> {
-    pub email: &'a str,
-    pub password: &'a str,
-}
 
