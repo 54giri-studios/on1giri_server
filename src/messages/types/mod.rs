@@ -6,6 +6,7 @@ use rocket::{data::{self, FromData}, Request, Data};
 
 use crate::User;
 
+/// The minimal data that is provided for creating a message
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = crate::schema::messages)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -15,6 +16,9 @@ pub struct NewMessage<'a> {
     content: Cow<'a, str>,
 }
 
+/// Represents a pre-processed [Message] that is ready
+/// to be inserted in the database.
+/// Can be inserted into [crate::schema::messages]
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = crate::schema::messages)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -36,6 +40,8 @@ impl<'a> InsertableMessage<'a> {
     }
 }
 
+/// Represents a messaged that was retrieved from the database.
+/// Mirrors [crate::schema::messages]
 #[derive(Serialize, Deserialize, Debug, Queryable, Selectable)]
 #[diesel(table_name = crate::schema::messages)]
 #[diesel(check_for_backend(diesel::pg::Pg))]

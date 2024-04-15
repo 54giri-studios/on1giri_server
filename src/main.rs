@@ -17,23 +17,25 @@ use ring::rand::{SecureRandom, SystemRandom};
 use std::{env, error::Error};
 
 mod channels;
-pub use channels::Channel;
+pub use channels::types::*;
 
 mod guilds;
-pub use guilds::Guild;
+pub use guilds::types::*;
 
 mod login;
 
 mod members;
 
 mod messages;
-pub use messages::Message;
+pub use messages::types::*;
 
-mod users;
-pub use users::{User, UserMetadata};
 
 mod roles;
-pub use roles::Role;
+pub use roles::types::*;
+
+mod users;
+pub use users::types::*;
+
 
 type Db = AsyncDieselConnectionManager<AsyncPgConnection>;
 type DbPool = Pool<AsyncPgConnection>;

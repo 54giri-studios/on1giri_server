@@ -7,7 +7,7 @@ use std::env;
 mod routes;
 pub use routes::*;
 
-mod types;
+pub mod types;
 pub use types::*;
 
 use rocket::{http::hyper::server::conn::AddrIncoming, Route};

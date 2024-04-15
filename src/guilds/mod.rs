@@ -1,6 +1,7 @@
-mod types;
 use chrono::{DateTime, Utc};
 use diesel_async::RunQueryDsl;
+
+pub mod types;
 pub use types::*;
 
 mod routes;

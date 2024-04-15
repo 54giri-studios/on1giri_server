@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
-use diesel::{deserialize::Queryable, prelude::Insertable, ExpressionMethods};
+use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 
 use crate::DbPool;
 
-mod types;
+pub mod types;
 pub use types::*; 
 
 mod routes;
@@ -56,5 +56,4 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     Ok(())
-
 }
