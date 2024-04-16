@@ -1,4 +1,5 @@
 //! Functions / Routes used interact with user data
+use chrono::DateTime;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 
@@ -10,7 +11,7 @@ pub use routes::*;
 pub mod types;
 pub use types::*;
 
-use rocket::{http::hyper::server::conn::AddrIncoming, Route};
+use rocket::Route;
 
 use crate::{schema::users::access_level, users, DbPool};
 
@@ -54,6 +55,49 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
         ))
         .execute(&mut connection)
         .await?;
+
+    use crate::schema::users_metadata::dsl as m_dsl;
+
+    let username = env::var("OVERLORD_USERNAME").unwrap();
+    let discriminator: i16 = env::var("OVERLORD_DISCRIMINATOR")
+        .unwrap()
+        .parse()
+        .unwrap();
+    let last_check_in = {
+        let lci_str = env::var("OVERLORD_LAST_CHECK_IN").unwrap();
+        DateTime::from_timestamp(
+            lci_str.parse().unwrap(), 
+            0
+        ).unwrap()
+    };
+    let picture = env::var("OVERLORD_PICTURE").unwrap();
+
+    let account_creation = {
+        let lci_str = env::var("OVERLORD_ACCOUNT_CREATION").unwrap();
+        DateTime::from_timestamp(
+            lci_str.parse().unwrap(), 
+            0
+        ).unwrap()
+    };
+    let description = env::var("OVERLORD_DESCRIPTION").unwrap();
+    let overlord_meta = UserMetadata {
+        id: 0,
+        username,
+        discriminator,
+        last_check_in,
+        picture,
+        account_creation,
+        description
+    };
+
+    diesel::insert_into(m_dsl::users_metadata)
+        .values(&overlord_meta)
+        .on_conflict(m_dsl::id)
+        .do_update()
+        .set(&overlord_meta)
+        .execute(&mut connection)
+        .await
+        .unwrap();
 
     Ok(())
 }

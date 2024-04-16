@@ -51,17 +51,23 @@ pub struct NewUser<'a> {
     pub email: Cow<'a, str>
 }
 
-#[derive(Debug, Queryable, Insertable, Selectable, Serialize)]
+#[derive(Debug, Queryable, Insertable, Selectable, Serialize, AsChangeset)]
 #[diesel(table_name = crate::schema::users_metadata)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct UserMetadata {
     pub id: i32,
-    username: String,
-    discriminator: i16,
-    last_check_in: chrono::DateTime<Utc>,
-    picture: String,
-    account_creation: chrono::DateTime<Utc>,
-    description: String
+    pub username: String,
+    pub discriminator: i16,
+    pub last_check_in: chrono::DateTime<Utc>,
+    pub picture: String,
+    pub account_creation: chrono::DateTime<Utc>,
+    pub description: String
+}
+
+impl UserMetadata {
+    pub fn user_id(&self) -> &i32 {
+        &self.id
+    }
 }
 
 

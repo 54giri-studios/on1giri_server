@@ -3,6 +3,7 @@
 #[macro_use] extern crate serde;
 #[macro_use] extern crate rocket;
 
+use chrono::TimeDelta;
 use diesel_async::{
     pooled_connection::{
         deadpool::{BuildError, Pool}, AsyncDieselConnectionManager, PoolError
@@ -88,7 +89,7 @@ async fn rocket() -> _ {
 
 
     let mut subscriptions = SubscriptionState::new();
-    let token_handler = TokenHandler::new()
+    let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));
 
     rocket::build()
