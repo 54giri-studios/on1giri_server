@@ -1,8 +1,8 @@
-use diesel::{prelude::*, sql_types::Date};
+use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
-use rocket::{serde::json::Json, time::PrimitiveDateTime, State};
+use rocket::{serde::json::Json, State};
 
-use crate::{Channel, Db, DbPool, Message};
+use crate::{Channel, DbPool};
 
 #[get("/<channel_id>")]
 pub async fn get_channel(pool: &State<DbPool>, channel_id: i32) -> Json<Channel> {

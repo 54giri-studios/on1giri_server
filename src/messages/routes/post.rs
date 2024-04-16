@@ -1,4 +1,4 @@
-use diesel::{IntoSql, SelectableHelper};
+use diesel::SelectableHelper;
 use diesel_async::RunQueryDsl;
 use rocket::serde::json::Json;
 use rocket::State;
@@ -7,10 +7,9 @@ use crate::messages::{InsertableMessage, NewMessage};
 use crate::{DbPool, Message};
 use crate::schema::messages;
 
-#[post("/<channel_id>", format = "json", data = "<message>")]
+#[post("/", format = "json", data = "<message>")]
 pub async fn post_message<'a>(
     pool: &State<DbPool>, 
-    channel_id: i32, 
     message: Json<NewMessage<'a>>
 ) -> Json<Message<'a>>{
     let new_message = message.into_inner();

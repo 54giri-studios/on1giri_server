@@ -1,10 +1,8 @@
-use chrono::Utc;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
-use ring::rand::{SecureRandom, SystemRandom};
-use rocket::{form::Form, http::{hyper::Response, Cookie, CookieJar}, serde::json::Json, State};
+use rocket::{serde::json::Json, State};
 
-use crate::{schema::users, users::NewUser, DbPool, User, UserMetadata};
+use crate::{schema::users, users::NewUser, DbPool, User};
 
 #[post("/create", format = "json", data = "<new_user>")]
 pub async fn user_create<'a>(pool: &State<DbPool>, new_user: Json<NewUser<'a>>) -> Json<User<'a>> {

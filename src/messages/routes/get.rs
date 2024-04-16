@@ -1,7 +1,6 @@
 use diesel::prelude::*;
-use diesel_async::{RunQueryDsl, AsyncConnection, AsyncPgConnection};
+use diesel_async::RunQueryDsl;
 
-use rocket::{http::hyper::server::conn, response::status::NotFound};
 use rocket::serde::json::Json;
 use rocket::State;
 

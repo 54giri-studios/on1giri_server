@@ -1,20 +1,16 @@
-use base64::prelude::*;
-
-use chrono::{DateTime, MappedLocalTime, TimeZone, Utc};
+use chrono::Utc;
 use diesel::prelude::*;
 use rocket::time::Duration;
 
 use crate::{LoginResponse, RawToken, VerifiedToken};
-use crate::{login::TokenHandler, ActiveSession, DbPool, LoginForm, User, UserMetadata};
+use crate::{login::TokenHandler, DbPool, LoginForm, UserMetadata};
 use diesel_async::RunQueryDsl;
 
 
 use rocket::{
     form::Form,
-    http::{ContentType, Cookie, CookieJar, SameSite, Status},
-    response::status,
+    http::{Cookie, CookieJar, Status},
     serde::json::Json,
-    Response,
     State,
 };
 

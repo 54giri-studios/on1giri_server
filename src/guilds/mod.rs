@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use diesel_async::RunQueryDsl;
 
 pub mod types;

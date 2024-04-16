@@ -1,9 +1,8 @@
 use base64::prelude::*;
-use chrono::{offset::LocalResult, DateTime, MappedLocalTime, TimeDelta, TimeZone, Utc};
-use diesel::sql_types::Date;
+use chrono::{DateTime, MappedLocalTime, TimeDelta, TimeZone, Utc};
 use hex::FromHexError;
-use ring::{hmac::{self, Tag}, rand::{SecureRandom, SystemRandom}};
-use rocket::{http::{ContentType, Status}, request::{self, FromRequest, Request}, serde::json::Json};
+use ring::{hmac, rand::{SecureRandom, SystemRandom}};
+use rocket::http::Status;
 
 use crate::UserMetadata;
 
@@ -140,7 +139,7 @@ impl VerifiedToken {
 
         let generated_at: DateTime<Utc> = match Utc.timestamp_opt(timestamp, 0) {
             MappedLocalTime::Single(time) => time,
-            MappedLocalTime::Ambiguous(earliest, latest) => earliest,
+            MappedLocalTime::Ambiguous(earliest, _) => earliest,
             MappedLocalTime::None => return None,
         };
 
@@ -185,7 +184,7 @@ impl TokenHandler {
     }
 
     pub fn fill_nonce(&self, data: &mut [u8]) {
-        self.rng.fill(data);
+        self.rng.fill(data).unwrap();
     }
 
     pub fn sign(&self, data: &[u8]) -> String {

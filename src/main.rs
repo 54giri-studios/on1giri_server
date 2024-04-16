@@ -1,21 +1,13 @@
-#![allow(unused)]
-
 #[macro_use] extern crate serde;
 #[macro_use] extern crate rocket;
 
 use chrono::TimeDelta;
 use diesel_async::{
     pooled_connection::{
-        deadpool::{BuildError, Pool}, AsyncDieselConnectionManager, PoolError
+        deadpool::{BuildError, Pool}, AsyncDieselConnectionManager,
     },
-    AsyncConnection, 
     AsyncPgConnection,
-    RunQueryDsl
 };
-use gateway::SubscriptionState;
-use ring::rand::{SecureRandom, SystemRandom};
-
-use std::{env, error::Error};
 
 mod channels;
 pub use channels::types::*;
@@ -57,18 +49,9 @@ fn establish_db_connection() -> Result<DbPool, BuildError> {
     Pool::builder(config).build()
 }
 
-fn generate_secret_key(length: usize) -> Vec<u8> {
-    let rng = SystemRandom::new();
-    let mut buffer = vec![0; length];
-    rng.fill(&mut buffer).unwrap();
-
-    buffer
-}
-
-
 #[launch]
 async fn rocket() -> _ {
-    let mut pool = match establish_db_connection() {
+    let pool = match establish_db_connection() {
         Ok(p) => p,
         Err(err) => {
             panic!("Failed to connect to the database: {err}");
@@ -88,13 +71,11 @@ async fn rocket() -> _ {
     };
 
 
-    let mut subscriptions = SubscriptionState::new();
     let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));
 
     rocket::build()
         .manage(pool)
-        .manage(subscriptions)
         .manage(token_handler)
         .mount("/channels/", channels::routes())
         .mount("/gateway/", gateway::routes())

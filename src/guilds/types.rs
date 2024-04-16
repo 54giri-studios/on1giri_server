@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-use crate::roles::Role;
-use crate::channels::Channel;
 use chrono::{DateTime, Utc};
 use diesel::{deserialize::Queryable, prelude::Insertable};
 

@@ -1,4 +1,4 @@
-use diesel::{prelude::*, sql_types::Date};
+use diesel::prelude::*;
 use std::borrow::Cow;
 use chrono::{DateTime, Utc};
 

@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 

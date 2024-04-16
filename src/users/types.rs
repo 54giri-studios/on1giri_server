@@ -1,12 +1,9 @@
-use std::{alloc::System, borrow::Cow, fmt::format};
+use std::borrow::Cow;
 
 
-use chrono::{self, Utc};
+use chrono::Utc;
 use diesel::prelude::*;
-use rocket::request::FromRequest;
 use serde::Serialize;
-
-use base64::prelude::*;
 
 #[derive(Debug, Queryable, Insertable, Selectable)]
 #[diesel(table_name = crate::schema::access_levels)]

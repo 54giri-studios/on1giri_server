@@ -1,10 +1,7 @@
 use std::borrow::Cow;
 
 use chrono::{DateTime, Utc};
-use diesel::{deserialize::{FromSqlRow, Queryable}, prelude::Insertable, Selectable};
-use rocket::{data::{self, FromData}, Request, Data};
-
-use crate::User;
+use diesel::prelude::*;
 
 /// The minimal data that is provided for creating a message
 #[derive(Debug, Serialize, Deserialize, Insertable)]
