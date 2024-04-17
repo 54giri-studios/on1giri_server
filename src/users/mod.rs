@@ -11,9 +11,8 @@ pub use routes::*;
 pub mod types;
 pub use types::*;
 
-use rocket::Route;
 
-use crate::{schema::users::access_level, users, DbPool};
+use crate::DbPool;
 
 pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
     let mut connection = pool.get().await?;
@@ -32,9 +31,9 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
             .await?;
     }
 
-    let email = env::var("OVERLORD_EMAIL").unwrap();
-    let password = env::var("OVERLORD_PASSWORD").unwrap();
-    let ov_access_level = env::var("OVERLORD_ACCESS_LEVEL").unwrap();
+    let email = env::var("OVERLORD_EMAIL").expect("OVERLORD_EMAIL env var must be set");
+    let password = env::var("OVERLORD_PASSWORD").expect("OVERLORD_PASSWORD env var must be set");
+    let ov_access_level = env::var("OVERLORD_ACCESS_LEVEL").expect("OVERLORD_ACCESS_LEVEL env var must be set");
 
     let overlord = User {
         id: 0,
@@ -58,28 +57,29 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
 
     use crate::schema::users_metadata::dsl as m_dsl;
 
-    let username = env::var("OVERLORD_USERNAME").unwrap();
+    let username = env::var("OVERLORD_USERNAME").expect("OVERLORD_USERNAME must be set");
     let discriminator: i16 = env::var("OVERLORD_DISCRIMINATOR")
-        .unwrap()
+        .expect("OVERLORD_DISCRIMINATOR env var must be set")
         .parse()
         .unwrap();
     let last_check_in = {
-        let lci_str = env::var("OVERLORD_LAST_CHECK_IN").unwrap();
+        let lci_str = env::var("OVERLORD_LAST_CHECK_IN")
+            .expect("OVERLORD_LAST_CHECK_IN env var must be set");
         DateTime::from_timestamp(
             lci_str.parse().unwrap(), 
             0
         ).unwrap()
     };
-    let picture = env::var("OVERLORD_PICTURE").unwrap();
+    let picture = env::var("OVERLORD_PICTURE").expect("OVERLORD_PICTURE env var must be set");
 
     let account_creation = {
-        let lci_str = env::var("OVERLORD_ACCOUNT_CREATION").unwrap();
+        let lci_str = env::var("OVERLORD_ACCOUNT_CREATION").expect("OVERLORD_ACCOUNT_CREATION env var must be set");
         DateTime::from_timestamp(
             lci_str.parse().unwrap(), 
             0
         ).unwrap()
     };
-    let description = env::var("OVERLORD_DESCRIPTION").unwrap();
+    let description = env::var("OVERLORD_DESCRIPTION").expect("OVERLORD_DESCRIPTION env var must be set");
     let overlord_meta = UserMetadata {
         id: 0,
         username,
