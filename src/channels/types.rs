@@ -57,7 +57,7 @@ impl<'a> ChannelKind<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HistoryConfig {
     pub limit: Option<i32>,
     pub before: Option<DateTime<Utc>>,
