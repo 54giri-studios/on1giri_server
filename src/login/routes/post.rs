@@ -2,7 +2,7 @@ use chrono::Utc;
 use diesel::prelude::*;
 use rocket::time::Duration;
 
-use crate::{LoginResponse, RawToken, VerifiedToken};
+use crate::{ErrorResponse, JsonResponse, RawToken, VerifiedToken};
 use crate::{login::TokenHandler, DbPool, LoginForm, UserMetadata};
 use diesel_async::RunQueryDsl;
 
@@ -10,7 +10,6 @@ use diesel_async::RunQueryDsl;
 use rocket::{
     form::Form,
     http::{Cookie, CookieJar, Status},
-    serde::json::Json,
     State,
 };
 
@@ -24,12 +23,7 @@ fn check_token<'a>(
     let token = RawToken::new(token.value());
     let token = token.parse()?;
 
-    println!("{:#?}", token);
-
-    let verified = token.verify(&token_handler)?;
-
-    println!("{:#?}", verified);
-
+    let verified = token.verify(token_handler)?;
 
     if Utc::now() - verified.generated_at() < *token_handler.signature_validity() {
         Some(verified)
@@ -44,9 +38,12 @@ pub async fn login<'a, 'b>(
     token_handler: &State<TokenHandler>,
     cookies: &CookieJar<'a>,
     credentials: Option<Form<LoginForm<'b>>>
-) -> Json<LoginResponse> {
+) -> JsonResponse<UserMetadata> {
 
-    let mut conn = pool.get().await.unwrap();
+    let mut conn = match pool.get().await {
+        Ok(conn) => conn,
+        Err(err) => return Err(ErrorResponse::internal_error(err).into())
+    };
 
     use crate::schema::users_metadata::dsl as m_dsl;
     use crate::schema::users::dsl as u_dsl;
@@ -60,13 +57,14 @@ pub async fn login<'a, 'b>(
             .await;
 
         if let Ok(meta) = maybe_meta {
-            return LoginResponse::new(Status::Ok, Some(meta)).into();
+            return Ok(meta.into());
         };
+
+        // Ignoring an invalid / expired token
     };
 
-
     let Some(credentials) = credentials else {
-        return LoginResponse::new(Status::BadRequest, None).into();
+        return Err(ErrorResponse::new(Status::Forbidden, "No credentials were provided").into());
     };
 
     let query: Result<UserMetadata, _> = u_dsl::users
@@ -81,7 +79,7 @@ pub async fn login<'a, 'b>(
 
     match query {
         Err(_) => {
-            LoginResponse::new(Status::Forbidden, None).into()
+            Err(ErrorResponse::new(Status::NotFound, "Unknown email / password combination").into())
         },
         Ok(meta) => {
             let token = VerifiedToken::new(*meta.user_id(), token_handler);
@@ -94,7 +92,7 @@ pub async fn login<'a, 'b>(
 
             cookies.add_private(cookie);
 
-            LoginResponse::new(Status::Ok, Some(meta)).into()
+            Ok(meta.into())
         }
     }
 }

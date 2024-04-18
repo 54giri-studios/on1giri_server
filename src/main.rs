@@ -2,12 +2,7 @@
 #[macro_use] extern crate rocket;
 
 use chrono::TimeDelta;
-use diesel_async::{
-    pooled_connection::{
-        deadpool::{BuildError, Pool}, AsyncDieselConnectionManager,
-    },
-    AsyncPgConnection,
-};
+use diesel_async::pooled_connection::deadpool::{BuildError, Pool};
 
 mod channels;
 pub use channels::types::*;
@@ -23,16 +18,15 @@ mod members;
 mod messages;
 pub use messages::types::*;
 
-
 mod roles;
 pub use roles::types::*;
 
 mod users;
 pub use users::types::*;
 
+mod types;
+pub use types::*;
 
-type Db = AsyncDieselConnectionManager<AsyncPgConnection>;
-type DbPool = Pool<AsyncPgConnection>;
 
 mod gateway;
 
