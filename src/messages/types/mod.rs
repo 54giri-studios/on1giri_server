@@ -3,10 +3,11 @@ use std::borrow::Cow;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 
-
+use rocket::{
+    serde::{Deserialize, Serialize},
+    tokio::sync::{broadcast::Sender, Mutex},
+};
 use std::collections::HashMap;
-use rocket::{serde::{Deserialize, Serialize}, tokio::sync::{broadcast::Sender, Mutex}};
-
 
 /// The minimal data that is provided for creating a message
 #[derive(Debug, Serialize, Deserialize, Insertable)]
@@ -28,7 +29,7 @@ pub struct InsertableMessage<'a> {
     channel_id: i32,
     author_id: i32,
     content: Cow<'a, str>,
-    creation_date: DateTime<Utc>
+    creation_date: DateTime<Utc>,
 }
 
 impl<'a> InsertableMessage<'a> {
@@ -37,7 +38,7 @@ impl<'a> InsertableMessage<'a> {
             channel_id: msg.channel_id,
             author_id: msg.author_id,
             content: msg.content,
-            creation_date: Utc::now()
+            creation_date: Utc::now(),
         }
     }
 }
@@ -52,10 +53,8 @@ pub struct Message<'a> {
     channel_id: i32,
     author_id: i32,
     content: Cow<'a, str>,
-    creation_date: DateTime<Utc>
+    creation_date: DateTime<Utc>,
 }
-
-
 
 // the different types of messages that a client could
 // send down the channel
@@ -64,7 +63,7 @@ pub struct Message<'a> {
 pub enum MessageType {
     CONNECT,
     SEND,
-    QUIT
+    QUIT,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -74,7 +73,7 @@ pub struct ChannelMessage {
     pub message_type: MessageType,
     pub content: String,
     pub author_id: i32,
-    pub creation_date: DateTime<Utc>
+    pub creation_date: DateTime<Utc>,
 }
 
 impl ChannelMessage {
