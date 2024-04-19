@@ -15,7 +15,7 @@ use crate::schema::messages;
 use crate::{DbPool, ChannelMessage, AppState};
 
 #[derive(Debug, Responder)]
-enum ApiResponse {
+pub enum ApiResponse {
     #[response(status = 200, content_type = "json")]
     SUCCEEDED(Value),
     #[response(status = 401, content_type = "json")]

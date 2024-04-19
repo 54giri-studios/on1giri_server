@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use rocket::{serde::{Deserialize, Serialize}, tokio::sync::{broadcast::Sender, Mutex}};
 
 
-
 /// The minimal data that is provided for creating a message
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = crate::schema::messages)]
@@ -71,10 +70,10 @@ pub enum MessageType {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct ChannelMessage {
-    pub channel_id: u32,
+    pub channel_id: i32,
     pub message_type: MessageType,
     pub content: String,
-    pub author_id: u32,
+    pub author_id: i32,
     pub creation_date: DateTime<Utc>
 }
 
@@ -83,7 +82,7 @@ impl ChannelMessage {
         Self {
             channel_id: msg.channel_id,
             author_id: msg.author_id,
-            content: msg.content,
+            content: msg.content.into(),
             message_type: MessageType::SEND,
             creation_date: msg.creation_date,
         }
@@ -94,5 +93,5 @@ pub struct AppState {
     // will contain the room ids with the Sender end of the
     // broadcast sockets
     // each connections between a client and the server is in here
-    pub clients: Mutex<HashMap<u32, Sender<ChannelMessage>>>,
+    pub clients: Mutex<HashMap<i32, Sender<ChannelMessage>>>,
 }
