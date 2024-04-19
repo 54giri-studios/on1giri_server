@@ -3,6 +3,12 @@ use std::borrow::Cow;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 
+
+use std::collections::HashMap;
+use rocket::{serde::{Deserialize, Serialize}, tokio::sync::{broadcast::Sender, Mutex}};
+
+
+
 /// The minimal data that is provided for creating a message
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = crate::schema::messages)]
@@ -50,3 +56,43 @@ pub struct Message<'a> {
     creation_date: DateTime<Utc>
 }
 
+
+
+// the different types of messages that a client could
+// send down the channel
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, FromFormField)]
+#[serde(crate = "rocket::serde")]
+pub enum MessageType {
+    CONNECT,
+    SEND,
+    QUIT
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ChannelMessage {
+    pub channel_id: u32,
+    pub message_type: MessageType,
+    pub content: String,
+    pub author_id: u32,
+    pub creation_date: DateTime<Utc>
+}
+
+impl ChannelMessage {
+    pub fn new(msg: InsertableMessage) -> Self {
+        Self {
+            channel_id: msg.channel_id,
+            author_id: msg.author_id,
+            content: msg.content,
+            message_type: MessageType::SEND,
+            creation_date: msg.creation_date,
+        }
+    }
+}
+
+pub struct AppState {
+    // will contain the room ids with the Sender end of the
+    // broadcast sockets
+    // each connections between a client and the server is in here
+    pub clients: Mutex<HashMap<u32, Sender<ChannelMessage>>>,
+}
