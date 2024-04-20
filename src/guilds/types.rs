@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
 use chrono::{DateTime, Utc};
-use diesel::{deserialize::Queryable, prelude::Insertable};
+use diesel::{deserialize::Queryable, prelude::Insertable, Selectable};
 
 /// Represents a guild
 /// Mirrors [crate::schema::guilds]
-#[derive(Debug, Serialize, Deserialize, Insertable, Queryable)]
+#[derive(Debug, Serialize, Deserialize, Insertable, Queryable, Selectable)]
 #[diesel(table_name = crate::schema::guilds)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Guild<'a> {

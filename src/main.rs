@@ -60,10 +60,13 @@ async fn rocket() -> _ {
         panic!("Error setting up the system guild {err}");
     };
 
+    if let Err(err) = members::setup(&pool).await {
+        panic!("Error setting up the default member: {err}");
+    }
+
     if let Err(err) = channels::setup(&pool).await {
         panic!("Error setting up the system channel {err}");
     };
-
 
     let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));
