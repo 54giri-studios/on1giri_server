@@ -65,6 +65,17 @@ CREATE TABLE "channels"(
 	FOREIGN KEY ("kind") REFERENCES "channel_kinds" ("kind")
 );
 
+CREATE TABLE "channel_permissions" (
+	"role_id" INT4 NOT NULL,
+	"guild_id" INT4 NOT NULL,
+	"channel_id" INT4 NOT NULL,
+	"can_read" BOOLEAN NOT NULL,
+	"can_write" BOOLEAN NOT NULL,
+	PRIMARY KEY ("role_id", "guild_id", "channel_id"),
+	FOREIGN KEY ("role_id", "guild_id") REFERENCES "roles" ("id", "guild_id"),
+	FOREIGN KEY ("channel_id") REFERENCES "channels" ("id")
+);
+
 -- Messages
 CREATE TABLE "messages"(
 	"id" SERIAL NOT NULL,

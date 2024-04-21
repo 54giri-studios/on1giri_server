@@ -13,6 +13,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    channel_permissions (role_id, guild_id, channel_id) {
+        role_id -> Int4,
+        guild_id -> Int4,
+        channel_id -> Int4,
+        can_read -> Bool,
+        can_write -> Bool,
+    }
+}
+
+diesel::table! {
     channels (id) {
         id -> Int4,
         guild_id -> Int4,
@@ -77,6 +87,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(channel_permissions -> channels (channel_id));
 diesel::joinable!(channels -> channel_kinds (kind));
 diesel::joinable!(channels -> guilds (guild_id));
 diesel::joinable!(guilds -> users (owner_id));
@@ -91,6 +102,7 @@ diesel::joinable!(users_metadata -> users (id));
 diesel::allow_tables_to_appear_in_same_query!(
     access_levels,
     channel_kinds,
+    channel_permissions,
     channels,
     guilds,
     members,
