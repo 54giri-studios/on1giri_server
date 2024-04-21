@@ -2,8 +2,12 @@
 #[macro_use] extern crate serde;
 #[macro_use] extern crate rocket;
 
+
 use chrono::TimeDelta;
 use diesel_async::pooled_connection::deadpool::{BuildError, Pool};
+use std::collections::HashMap;
+
+use rocket::tokio::sync::Mutex;
 
 mod channels;
 pub use channels::types::*;
@@ -28,17 +32,16 @@ pub use users::types::*;
 mod types;
 pub use types::*;
 
-
 mod gateway;
 
-pub mod schema; 
+pub mod schema;
 
 fn establish_db_connection() -> Result<DbPool, BuildError> {
     dotenvy::dotenv().ok();
-    
+
     let config = Db::new(
         std::env::var("DATABASE_URL")
-            .unwrap_or_else(|_| panic!("DATABASE_URL env var must be set"))
+            .unwrap_or_else(|_| panic!("DATABASE_URL env var must be set")),
     );
 
     Pool::builder(config).build()
@@ -75,6 +78,9 @@ async fn rocket() -> _ {
     rocket::build()
         .manage(pool)
         .manage(token_handler)
+        .manage(AppState {
+            clients: Mutex::new(HashMap::new()),
+        })
         .mount("/channels/", channels::routes())
         .mount("/gateway/", gateway::routes())
         .mount("/guilds/", guilds::routes())

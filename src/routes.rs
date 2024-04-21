@@ -9,45 +9,6 @@ use rocket::{
     Shutdown, State,
 };
 
-#[get("/subscribe/<channel_id>")]
-pub async fn subscribe(
-    channel_id: u32,
-    sessions: &State<server::AppState>,
-    mut end: Shutdown,
-) -> EventStream![] {
-    let mut sessions = sessions.clients.lock().await;
-    // Does the sessions exists ?
-    // If not we create it and store in the state (meaning new conversation)
-    let new_cli = if let Some(existing_cli) = sessions.get(&channel_id) {
-        existing_cli.clone()
-    } else {
-        let new_cli = broadcast::channel(10).0;
-        sessions.insert(channel_id, new_cli.clone());
-        new_cli
-    };
-
-    let queue: &Sender<server::Message> = &new_cli;
-
-    // Add the client to the broadcast channel so that he can receive messages
-    let mut client = queue.subscribe();
-
-    EventStream! {
-        // Messages received down the channel are sent to the clients that
-        // they've subscribed to
-        loop {
-            let msg = select! {
-                msg  = client.recv() => match msg {
-                    Ok(msg) => msg,
-                    Err(RecvError::Closed) => break,
-                    Err(RecvError::Lagged(_)) => continue,
-                },
-                _ = &mut end => break,
-            };
-
-            yield Event::json(&msg);
-        }
-    }
-}
 
 #[post("/publish", format = "json", data = "<message>")]
 pub async fn publish(sessions: &State<server::AppState>, message: Json<server::Message>) {
