@@ -6,6 +6,7 @@ use rocket::{serde::json::Json, State};
 
 use crate::{DbPool, ErrorResponse, HistoryConfig, Message};
 
+/// Retrieves a channel's most recent messages
 #[post("/<channel_id>/messages/history", data = "<history_config>", format = "json")]
 pub async fn get_channel_history(pool: &State<DbPool>, channel_id: i32, history_config: Json<HistoryConfig>) -> Result<Json<Vec<Message>>, Json<ErrorResponse>> {
     let mut conn = pool.get().await.unwrap();
@@ -23,6 +24,10 @@ pub async fn get_channel_history(pool: &State<DbPool>, channel_id: i32, history_
 
     if let Some(after) = history_config.after {
         boxed_select = boxed_select.filter(m_dsl::creation_date.ge(after));
+    }
+
+    if let Some(limit) = history_config.limit {
+        boxed_select = boxed_select.limit(limit as i64);
     }
 
     let maybe_messages: Result<Vec<Message>, _> = boxed_select
