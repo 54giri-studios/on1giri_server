@@ -43,7 +43,7 @@ pub async fn get_channel(pool: &State<DbPool>, channel_id: i32) -> Result<Json<C
 pub async fn post_channel<'a>(
     pool: &State<DbPool>, 
     new_channel: Json<NewChannel<'a>>
-) -> Result<Json<Channel<'a>>, Json<ErrorResponse>> {
+) -> Result<Json<Channel>, Json<ErrorResponse>> {
     let mut conn = match pool.get().await {
         Ok(pool) => pool,
         Err(err) => return Err(ErrorResponse::internal_error(err).into()),
@@ -51,7 +51,7 @@ pub async fn post_channel<'a>(
 
     use crate::schema::channels::dsl as c_dsl;
 
-    let maybe_channel: Result<Channel<'_>, _> = diesel::insert_into(c_dsl::channels)
+    let maybe_channel: Result<Channel, _> = diesel::insert_into(c_dsl::channels)
         .values(new_channel.into_inner())
         .returning(Channel::as_returning())
         .get_result(&mut conn)

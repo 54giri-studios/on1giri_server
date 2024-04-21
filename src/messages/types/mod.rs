@@ -9,6 +9,8 @@ use rocket::{
 };
 use std::collections::HashMap;
 
+use crate::{Channel, User, UserMetadata};
+
 /// The minimal data that is provided for creating a message
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = crate::schema::messages)]
@@ -54,6 +56,27 @@ pub struct Message<'a> {
     author_id: i32,
     content: Cow<'a, str>,
     creation_date: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PopulatedMessage<'a> {
+    id: i32,
+    channel: Channel,
+    author: UserMetadata,
+    content: Cow<'a, str>,
+    creation_date: DateTime<Utc>,
+}
+
+impl<'a> PopulatedMessage<'a> {
+    pub fn new(msg: Message<'a>, channel: Channel, author: UserMetadata) -> Self {
+        Self {
+            id: msg.id,
+            channel,
+            author,
+            content: msg.content,
+            creation_date: msg.creation_date
+        }
+    }
 }
 
 // the different types of messages that a client could

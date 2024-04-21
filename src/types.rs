@@ -10,14 +10,14 @@ use diesel::result::Error as DieselError;
 
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
-    status: u16,
+    status: Status,
     description: String
 }
 
 impl ErrorResponse {
     pub fn new<T>(status: Status, description: T) -> Self 
     where T: Into<String> {
-        Self { status: status.code, description: description.into() }
+        Self { status, description: description.into() }
     }
 
     pub fn internal_error<T>(error: T) -> Self

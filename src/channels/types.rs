@@ -13,20 +13,20 @@ pub struct NewChannel<'a> {
 
 /// Represents a generic channel.
 /// Mirrors [crate::schema::channels] in the database
-#[derive(Debug, Serialize, Insertable, Queryable, Selectable)]
+#[derive(Debug, Serialize, Insertable, Queryable, Selectable, QueryableByName)]
 #[diesel(table_name = crate::schema::channels)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct Channel<'a> {
+pub struct Channel {
     /// It's globally unique id
     pub id: i32,
     /// The guild's id that it belongs to
     /// Must refer to an actual [crate::Guild]
     pub guild_id: i32,
     /// It's display name
-    pub name: Cow<'a, str>,
+    pub name: String,
     /// The kind of the channel
     /// Must refer to an actual [crate::ChannelKind]
-    pub kind: Cow<'a, str>
+    pub kind: String
 }
 
 /// An enum like defining a [Channel]'s kind.
