@@ -4,36 +4,35 @@ use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use rocket::{serde::json::Json, State};
 
-use crate::{DbPool, HistoryConfig, Message};
+use crate::{DbPool, ErrorResponse, HistoryConfig, Message};
 
 #[post("/<channel_id>/messages/history", data = "<history_config>", format = "json")]
-pub async fn get_channel_history(pool: &State<DbPool>, channel_id: i32, history_config: Json<HistoryConfig>) -> Json<Vec<Message>>{
+pub async fn get_channel_history(pool: &State<DbPool>, channel_id: i32, history_config: Json<HistoryConfig>) -> Result<Json<Vec<Message>>, Json<ErrorResponse>> {
     let mut conn = pool.get().await.unwrap();
 
     use crate::schema::messages::dsl as m_dsl;
 
     let history_config = history_config.into_inner();
 
-    let messages: Vec<Message> = m_dsl::messages
-        .select(Message::as_select())
-        .limit(history_config.limit.unwrap_or(100).max(0).min(100) as i64)
-        .filter(
-            m_dsl::channel_id.eq(channel_id)
-                .and(
-                    m_dsl::creation_date.between(
-                        history_config.before.unwrap_or(DateTime::<Utc>::MIN_UTC),
-                        history_config.after.unwrap_or(DateTime::<Utc>::MAX_UTC)
-                )
-            )
-        )
+    let mut boxed_select = m_dsl::messages.into_boxed();
+    boxed_select = boxed_select.filter(m_dsl::channel_id.eq(channel_id));
+
+    if let Some(before) = history_config.before {
+        boxed_select = boxed_select.filter(m_dsl::creation_date.le(before));
+    };
+
+    if let Some(after) = history_config.after {
+        boxed_select = boxed_select.filter(m_dsl::creation_date.ge(after));
+    }
+
+    let maybe_messages: Result<Vec<Message>, _> = boxed_select
         .get_results(&mut conn)
-        .await
-        .unwrap_or(Vec::new());
+        .await;
 
-    messages.into()
+    match maybe_messages {
+        Ok(messages) => Ok(messages.into()),
+        Err(err) => {
+            Err(ErrorResponse::from(err).into())
+        }
+    }
 }
-
-/*
-pub async fn get_channel(pool: &State<DbPool>, channel_id: i32) -> Json<Message> {
-}
-*/

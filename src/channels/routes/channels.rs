@@ -15,6 +15,8 @@ use crate::{AppState, Channel, DbPool, ChannelMessage, ErrorResponse, NewChannel
 
 use diesel_async::{pooled_connection::deadpool::Pool, RunQueryDsl};
 
+/// Retrieves information about a single channel
+/// Refer to [crate::Channel] for the return type
 #[get("/<channel_id>")]
 pub async fn get_channel(pool: &State<DbPool>, channel_id: i32) -> Result<Json<Channel>, Json<ErrorResponse>> {
     let mut conn = match pool.get().await {
