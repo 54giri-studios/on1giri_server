@@ -13,7 +13,7 @@ pub struct AccessLevel<'a> {
 }
 
 impl<'a> AccessLevel<'a> {
-    pub fn new(level: &'a str) -> Self {
+    fn new(level: &'a str) -> Self {
         Self {
             level: level.into()
         }
