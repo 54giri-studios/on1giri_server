@@ -1,3 +1,8 @@
+use diesel::prelude::*;
+
+#[derive(Debug, AsChangeset, Selectable, Queryable, Insertable)]
+#[diesel(table_name = crate::schema::members)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Member {
     pub user_id: i32,
     pub guild_id: i32

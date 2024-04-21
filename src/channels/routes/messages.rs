@@ -6,7 +6,7 @@ use rocket::{serde::json::Json, State};
 
 use crate::{DbPool, HistoryConfig, Message};
 
-#[post("/<channel_id>/messages/history", data = "<history_config>")]
+#[post("/<channel_id>/messages/history", data = "<history_config>", format = "json")]
 pub async fn get_channel_history(pool: &State<DbPool>, channel_id: i32, history_config: Json<HistoryConfig>) -> Json<Vec<Message>>{
     let mut conn = pool.get().await.unwrap();
 

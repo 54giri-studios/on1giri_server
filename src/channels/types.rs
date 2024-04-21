@@ -2,6 +2,15 @@ use diesel::prelude::*;
 use std::borrow::Cow;
 use chrono::{DateTime, Utc};
 
+#[derive(Debug, Insertable, Deserialize)]
+#[diesel(table_name = crate::schema::channels)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct NewChannel<'a> {
+    guild_id: i32,
+    name: Cow<'a, str>,
+    kind: Cow<'a, str>
+}
+
 /// Represents a generic channel.
 /// Mirrors [crate::schema::channels] in the database
 #[derive(Debug, Serialize, Insertable, Queryable, Selectable)]
