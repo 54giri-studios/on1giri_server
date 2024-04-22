@@ -3,6 +3,8 @@ use rocket::Route;
 mod messages;
 mod channels;
 
+mod permissions;
+
 pub fn routes() -> Vec<Route> {
     let mut routes = routes![];
 

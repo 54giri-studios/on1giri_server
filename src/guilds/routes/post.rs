@@ -8,7 +8,7 @@ use crate::{DbPool, ErrorResponse, Guild, InsertableGuild, Newguild};
 pub async fn post_guild<'a>(
     pool: &State<DbPool>, 
     new_guild: Json<Newguild<'a>>,
-) -> Result<Json<Guild<'a>>, Json<ErrorResponse>> {
+) -> Result<Json<Guild>, Json<ErrorResponse>> {
 
     let mut conn = match pool.get().await {
         Ok(pool) => pool,
@@ -18,7 +18,7 @@ pub async fn post_guild<'a>(
     let insertable_guild = InsertableGuild::new(new_guild.into_inner());
 
     use crate::schema::guilds::dsl as g_dsl;
-    let maybe_guild: Result<Guild<'a>, _> = diesel::insert_into(g_dsl::guilds)
+    let maybe_guild: Result<Guild, _> = diesel::insert_into(g_dsl::guilds)
         .values(insertable_guild)
         .returning(Guild::as_returning())
         .get_result(&mut conn)

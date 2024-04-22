@@ -2,6 +2,8 @@ use diesel::prelude::*;
 use std::borrow::Cow;
 use chrono::{DateTime, Utc};
 
+use crate::{Guild, Role};
+
 #[derive(Debug, Insertable, Deserialize)]
 #[diesel(table_name = crate::schema::channels)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -71,4 +73,35 @@ pub struct HistoryConfig {
     pub limit: Option<i32>,
     pub before: Option<DateTime<Utc>>,
     pub after: Option<DateTime<Utc>>
+}
+
+#[derive(Debug, Serialize, Deserialize, Selectable, Queryable)]
+#[diesel(table_name = crate::schema::channel_permissions)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct ChannelPermissions {
+    role_id: i32,
+    guild_id: i32,
+    channel_id: i32,
+    can_read: bool,
+    can_write: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PopulatedChannelPermissions {
+    #[serde(flatten)]
+    permissions: ChannelPermissions,
+    role: Role,
+    guild: Guild,
+    channel: Channel,
+}
+
+impl PopulatedChannelPermissions {
+    pub fn new(
+        permissions: ChannelPermissions,
+        role: Role,
+        guild: Guild,
+        channel: Channel
+    ) -> Self {
+        Self { permissions, role, guild, channel }
+    }
 }

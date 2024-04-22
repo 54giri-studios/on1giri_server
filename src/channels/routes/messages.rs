@@ -34,6 +34,8 @@ pub async fn get_channel_history(pool: &State<DbPool>, channel_id: i32, history_
         boxed_select = boxed_select.filter(m_dsl::creation_date.ge(after));
     }
 
+    boxed_select = boxed_select.order_by(m_dsl::creation_date.desc());
+
     if let Some(limit) = history_config.limit {
         boxed_select = boxed_select.limit(limit as i64);
     }
