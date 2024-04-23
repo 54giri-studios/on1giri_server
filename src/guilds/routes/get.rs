@@ -3,21 +3,6 @@ use diesel_async::RunQueryDsl;
 use rocket::{serde::json::Json, State}; 
 use crate::{Channel, ChannelPermissions, DbPool, ErrorResponse, Guild, PopulatedChannelPermissions, PopulatedMessage, Role};
 
-#[get("/<guild_id>/channels")]
-pub async fn get_channels(pool: &State<DbPool>, guild_id: i32) -> Json<Vec<Channel>> {
-    let mut conn = pool.get().await.unwrap();
-
-    use crate::schema::channels::dsl;
-    let channels = dsl::channels
-        .select(Channel::as_select())
-        .filter(dsl::guild_id.eq(guild_id))
-        .get_results(&mut conn)
-        .await
-        .unwrap();
-
-    channels.into()
-}
-
 #[get("/<user_id>/guilds")]
 pub async fn get_guilds(pool: &State<DbPool>, user_id: i32) -> Result<Json<Vec<Guild>>, Json<ErrorResponse>> {
     let mut conn = match pool.get().await {
@@ -43,45 +28,6 @@ pub async fn get_guilds(pool: &State<DbPool>, user_id: i32) -> Result<Json<Vec<G
     }
 }
 
-#[get("/<guild_id>/channels/<channel_id>")]
-pub async fn get_permissions(
-    pool: &State<DbPool>,
-    guild_id: i32,
-    channel_id: i32
-) -> Result<Json<Vec<PopulatedChannelPermissions>>, Json<ErrorResponse>> {
-    let mut conn = match pool.get().await {
-        Ok(conn) => conn,
-        Err(err) => return Err(ErrorResponse::internal_error(err).into())
-    };
-
-    use crate::schema::{
-        channel_permissions::dsl as cp_dsl,
-        roles::dsl as r_dsl,
-        guilds::dsl as g_dsl,
-        channels::dsl as c_dsl,
-    };
-
-    let parts: Result<Vec<(ChannelPermissions, Role, Guild, Channel)>, _> = cp_dsl::channel_permissions
-        .filter(cp_dsl::guild_id.eq(guild_id))
-        .filter(cp_dsl::channel_id.eq(channel_id))
-        .inner_join(r_dsl::roles.on(r_dsl::id.eq(cp_dsl::role_id)))
-        .inner_join(g_dsl::guilds.on(g_dsl::id.eq(cp_dsl::guild_id)))
-        .inner_join(c_dsl::channels)
-        .get_results(&mut conn)
-        .await;
-
-    match parts {
-        Ok(parts) => {
-            let mut parts: Vec<PopulatedChannelPermissions> = parts
-                .into_iter()
-                .map(|(cp, r, g, c)| PopulatedChannelPermissions::new(cp, r, g, c))
-                .collect();
-
-            Ok(parts.into())
-        },
-        Err(err) => Err(ErrorResponse::from(err).into())
-    }
-}
 
 #[get("/<guild_id>/channels/<channel_id>/roles/<role_id>")]
 pub async fn get_permissions_for_role(

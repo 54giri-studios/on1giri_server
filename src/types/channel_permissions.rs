@@ -2,6 +2,14 @@ use diesel::prelude::*;
 
 use crate::{Guild, Role, Channel};
 
+#[derive(Debug, Deserialize, AsChangeset, Insertable)]
+#[diesel(table_name = crate::schema::channel_permissions)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct NewChannelPermissions {
+    can_read: Option<bool>,
+    can_write: Option<bool>
+}
+
 #[derive(Debug, Serialize, Deserialize, AsChangeset, Insertable, Selectable, Queryable, QueryableByName)]
 #[diesel(table_name = crate::schema::channel_permissions)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -20,11 +28,11 @@ impl ChannelPermissions {
 }
 #[derive(Debug, Serialize)]
 pub struct PopulatedChannelPermissions {
-    #[serde(flatten)]
-    permissions: ChannelPermissions,
     role: Role,
     guild: Guild,
     channel: Channel,
+    can_read: bool,
+    can_write: bool,
 }
 
 impl PopulatedChannelPermissions {
@@ -34,6 +42,33 @@ impl PopulatedChannelPermissions {
         guild: Guild,
         channel: Channel
     ) -> Self {
-        Self { permissions, role, guild, channel }
+        Self { 
+            role, 
+            guild, 
+            channel,
+            can_read: permissions.can_read,
+            can_write: permissions.can_write
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct ChannelPermissionsForRole {
+    role: Role,
+    guild_id: i32,
+    channel_id: i32,
+    can_read: bool,
+    can_write: bool,
+} 
+
+impl ChannelPermissionsForRole {
+    pub fn new(perms: ChannelPermissions, role: Role) -> Self {
+        Self {
+            role,
+            guild_id: perms.guild_id,
+            channel_id: perms.channel_id,
+            can_read: perms.can_read,
+            can_write: perms.can_write
+        }
     }
 }

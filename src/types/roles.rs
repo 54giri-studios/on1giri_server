@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::Color;
+use crate::{ChannelPermissions, Color};
 
 #[derive(Debug, Serialize, Deserialize, AsChangeset, Insertable, Queryable, QueryableByName, Selectable)]
 #[diesel(table_name = crate::schema::roles)]

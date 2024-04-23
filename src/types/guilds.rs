@@ -1,7 +1,7 @@
-use std::borrow::Cow;
-
 use chrono::{DateTime, Utc};
-use diesel::prelude::*;
+use diesel::{prelude::*, sql_types::Date};
+
+use crate::{Channel, Role, UserMetadata};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Newguild {
@@ -54,5 +54,35 @@ pub struct Guild {
 impl Guild {
     pub fn new(id: i32, name: String, owner_id: i32, description: String, creation_date: DateTime<Utc>) -> Self {
         Self { id, name, owner_id, description, creation_date }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct PopulatedGuild {
+    id: i32,
+    name: String,
+    owner: UserMetadata,
+    description: String,
+    creation_date: DateTime<Utc>,
+    roles: Vec<Role>,
+    channels: Vec<Channel>
+}
+
+impl PopulatedGuild {
+    pub fn new(
+        guild: Guild, 
+        owner: UserMetadata, 
+        roles: Vec<Role>, 
+        channels: Vec<Channel>
+    ) -> Self {
+        Self {
+            id: guild.id,
+            name: guild.name,
+            owner,
+            description: guild.description,
+            creation_date: guild.creation_date,
+            roles,
+            channels
+        }
     }
 }

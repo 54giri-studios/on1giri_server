@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use rocket::{serde::json::Json, State};
 
-use crate::{DbPool, ErrorResponse, Guild, Member, PopulatedMember, Role, User, UserMetadata};
+use crate::{DbPool, ErrorResponse, Guild, JsonResponse, Member, PopulatedMember, Role, User, UserMetadata};
 
 use crate::schema::{
     users_metadata::dsl as um,
@@ -13,7 +13,7 @@ use crate::schema::{
 };
 
 #[get("/<guild_id>/members/<member_id>")]
-pub async fn get_member(
+pub async fn get_guild_member(
     pool: &State<DbPool>,
     guild_id: i32, 
     member_id: i32
@@ -53,10 +53,10 @@ pub async fn get_member(
 }
 
 #[get("/<guild_id>/members")]
-pub async fn get_members(
+pub async fn get_guild_members(
     pool: &State<DbPool>,
     guild_id: i32,
-) -> Result<Json<Vec<PopulatedMember>>, Json<ErrorResponse>> {
+) -> JsonResponse<Vec<PopulatedMember>> {
     let mut conn = match pool.get().await {
         Ok(conn) => conn,
         Err(err) => return Err(ErrorResponse::internal_error(err).into()),
