@@ -2,9 +2,7 @@ use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 
 use crate::DbPool;
-
-pub mod types;
-pub use types::*; 
+use crate::{Channel, ChannelKind};
 
 mod routes;
 pub use routes::*;
@@ -31,27 +29,6 @@ pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
             .await
             .unwrap();
     }
-
-    let system_channel = Channel {
-        id: 0,
-        guild_id: 0,
-        name: "System channel".into(),
-        kind: "system".into()
-    };
-
-    use crate::schema::channels;
-
-    diesel::insert_into(channels::table)
-        .values(&system_channel)
-        .on_conflict(channels::id)
-        .do_update()
-        .set((
-            channels::name.eq(&system_channel.name),
-            channels::kind.eq(&system_channel.kind)
-        ))
-        .execute(&mut conn)
-        .await
-        .unwrap();
 
     Ok(())
 }

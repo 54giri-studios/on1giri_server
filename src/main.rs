@@ -10,24 +10,20 @@ use std::collections::HashMap;
 use rocket::tokio::sync::Mutex;
 
 mod channels;
-pub use channels::types::*;
 
 mod guilds;
-pub use guilds::types::*;
 
 mod login;
-pub use login::types::*;
 
 mod members;
 
 mod messages;
-pub use messages::types::*;
 
 mod roles;
-pub use roles::types::*;
+
+mod setup;
 
 mod users;
-pub use users::types::*;
 
 mod types;
 pub use types::*;
@@ -71,6 +67,15 @@ async fn rocket() -> _ {
     if let Err(err) = channels::setup(&pool).await {
         panic!("Error setting up the system channel {err}");
     };
+
+    if let Err(err) = roles::setup(&pool).await {
+        panic!("Error setting up roles {err}");
+    }
+
+    if let Err(err) = setup::setup_system(&pool).await {
+        panic!("Error setting up roles {err}");
+    }
+
 
     let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));

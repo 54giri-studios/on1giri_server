@@ -1,9 +1,7 @@
-mod types;
-use diesel::{query_dsl::methods::SelectDsl, Insertable};
+use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
-pub use types::*;
 
-use crate::DbPool;
+use crate::{DbPool, Member};
 
 pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
     let mut conn = pool.get().await?;

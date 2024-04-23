@@ -4,24 +4,24 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Newguild<'a> {
-    name: Cow<'a, str>,
+pub struct Newguild {
+    name: String,
     owner_id: i32,
-    description: Cow<'a, str>,
+    description: String,
 }
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = crate::schema::guilds)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct InsertableGuild<'a> {
-    name: Cow<'a, str>,
+pub struct InsertableGuild {
+    name: String,
     owner_id: i32,
-    description: Cow<'a, str>,
+    description: String,
     creation_date: DateTime<Utc>
 }
 
-impl<'a> InsertableGuild<'a> {
-    pub fn new(new_guild: Newguild<'a>) -> Self {
+impl InsertableGuild {
+    pub fn new(new_guild: Newguild) -> Self {
         Self {
             name: new_guild.name,
             owner_id: new_guild.owner_id,
@@ -33,7 +33,7 @@ impl<'a> InsertableGuild<'a> {
 
 /// Represents a guild
 /// Mirrors [crate::schema::guilds]
-#[derive(Debug, Serialize, Deserialize, Insertable, Queryable, Selectable, QueryableByName)]
+#[derive(Clone, Debug, Serialize, Deserialize, AsChangeset, Insertable, Queryable, Selectable, QueryableByName, PartialEq)]
 #[diesel(table_name = crate::schema::guilds)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Guild {
@@ -49,4 +49,10 @@ pub struct Guild {
     pub description: String,
     /// When it was created for the first time
     pub creation_date: DateTime<Utc>
+}
+
+impl Guild {
+    pub fn new(id: i32, name: String, owner_id: i32, description: String, creation_date: DateTime<Utc>) -> Self {
+        Self { id, name, owner_id, description, creation_date }
+    }
 }

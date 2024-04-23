@@ -1,10 +1,3 @@
-use diesel_async::{
-    pooled_connection::{
-        deadpool::Pool, AsyncDieselConnectionManager, PoolError,
-    },
-    AsyncPgConnection,
-};
-
 use rocket::{http::Status, serde::json::Json};
 use diesel::result::Error as DieselError;
 
@@ -36,12 +29,4 @@ impl From<DieselError> for ErrorResponse {
     }
 }
 
-impl From<PoolError> for ErrorResponse {
-    fn from(value: PoolError) -> Self {
-        Self::internal_error(value)
-    }
-}
-
-pub type Db = AsyncDieselConnectionManager<AsyncPgConnection>;
-pub type DbPool = Pool<AsyncPgConnection>;
 pub type JsonResponse<T> = Result<Json<T>, Json<ErrorResponse>>;

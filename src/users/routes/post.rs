@@ -2,10 +2,10 @@ use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use rocket::{serde::json::Json, State};
 
-use crate::{schema::users, users::NewUser, DbPool, User};
+use crate::{schema::users, NewUser, DbPool, User};
 
 #[post("/create", format = "json", data = "<new_user>")]
-pub async fn user_create<'a>(pool: &State<DbPool>, new_user: Json<NewUser<'a>>) -> Json<User<'a>> {
+pub async fn user_create<'a>(pool: &State<DbPool>, new_user: Json<NewUser<'a>>) -> Json<User> {
     let mut conn = pool.get().await.unwrap();
 
     let new_user = new_user.into_inner();

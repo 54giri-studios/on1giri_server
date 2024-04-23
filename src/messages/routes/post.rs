@@ -1,5 +1,5 @@
 //use crate::login::routes::post::check_token;
-use crate::login::TokenHandler;
+use crate::TokenHandler;
 use diesel::SelectableHelper;
 use diesel_async::RunQueryDsl;
 use rocket::http::CookieJar;
@@ -8,9 +8,8 @@ use rocket::serde::json::Json;
 use rocket::serde::json::Value;
 use rocket::response::Responder;
 use rocket::State;
-use crate::messages::Message;
 
-use crate::messages::{InsertableMessage, NewMessage};
+use crate::{InsertableMessage, NewMessage, Message};
 use crate::schema::messages;
 use crate::{DbPool, ChannelMessage, AppState};
 

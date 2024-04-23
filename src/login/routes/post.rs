@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use rocket::time::Duration;
 
 use crate::{ErrorResponse, JsonResponse, RawToken, VerifiedToken};
-use crate::{login::TokenHandler, DbPool, LoginForm, UserMetadata};
+use crate::{TokenHandler, DbPool, LoginForm, UserMetadata};
 use diesel_async::RunQueryDsl;
 
 

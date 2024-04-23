@@ -5,9 +5,9 @@ use rocket::{serde::json::Json, State};
 use crate::{DbPool, ErrorResponse, Guild, InsertableGuild, Newguild};
 
 #[post("/create", format = "json", data = "<new_guild>")]
-pub async fn post_guild<'a>(
+pub async fn post_guild(
     pool: &State<DbPool>, 
-    new_guild: Json<Newguild<'a>>,
+    new_guild: Json<Newguild>,
 ) -> Result<Json<Guild>, Json<ErrorResponse>> {
 
     let mut conn = match pool.get().await {

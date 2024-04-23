@@ -83,7 +83,7 @@ pub async fn get_permissions(
     }
 }
 
-#[get("/<guild_id>/channels/<channel_id>/<role_id>")]
+#[get("/<guild_id>/channels/<channel_id>/roles/<role_id>")]
 pub async fn get_permissions_for_role(
     pool: &State<DbPool>, 
     guild_id: i32, 

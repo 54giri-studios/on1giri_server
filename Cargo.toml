@@ -18,3 +18,4 @@ chrono = { version = "*", features = ["serde"]}
 base64 = "0.22.0"
 ring = "0.17.8"
 hex = "0.4.3"
+itertools = "0.12.1"
