@@ -51,3 +51,60 @@ pub async fn get_member(
 
     Ok(PopulatedMember::new(user_metadata, guild, roles).into())
 }
+
+#[get("/<guild_id>/members")]
+pub async fn get_members(
+    pool: &State<DbPool>,
+    guild_id: i32,
+) -> Result<Json<Vec<PopulatedMember>>, Json<ErrorResponse>> {
+    let mut conn = match pool.get().await {
+        Ok(conn) => conn,
+        Err(err) => return Err(ErrorResponse::internal_error(err).into()),
+    };
+
+    let maybe_guild: Result<Guild, _> = g::guilds
+        .filter(g::id.eq(guild_id))
+        .get_result(&mut conn)
+        .await;
+
+    let guild = match maybe_guild {
+        Ok(g) => g,
+        Err(err) => return Err(ErrorResponse::from(err).into())
+    };
+
+    let maybe_members: Result<Vec<(Member, UserMetadata)>, _> = m::members
+        .filter(m::guild_id.eq(guild_id))
+        .inner_join(um::users_metadata.on(um::id.eq(m::user_id)))
+        .select((Member::as_select(), UserMetadata::as_select()))
+        .get_results(&mut conn)
+        .await;
+
+    let rich_members = match maybe_members {
+        Ok(rm) => rm,
+        Err(err) => return Err(ErrorResponse::from(err).into()),
+    };
+
+    let mut populated_members: Vec<PopulatedMember> = Vec::with_capacity(rich_members.len());
+
+    for (member, user_meta) in rich_members.into_iter() {
+
+        let maybe_roles: Result<Vec<Role>, _> = r::roles
+            .filter(r::guild_id.eq(guild_id))
+            .inner_join(mr::members_roles)
+            .select(Role::as_select())
+            .get_results(&mut conn)
+            .await;
+
+        let roles = match maybe_roles {
+            Ok(roles) => roles,
+            Err(err) => return Err(ErrorResponse::from(err).into())
+        }; 
+        let populated_member = PopulatedMember::new(user_meta, guild.clone(), roles);
+
+        // That's exactly the sort of stuff that should 
+        // have been done with an event stream ...
+        populated_members.push(populated_member);
+    }
+
+    Ok(populated_members.into())
+}

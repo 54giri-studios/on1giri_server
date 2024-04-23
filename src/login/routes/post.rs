@@ -88,6 +88,9 @@ pub async fn login<'a, 'b>(
             let cookie = Cookie::build(("token", token_str))
                 .secure(true)
                 .http_only(true)
+                // Reminder: The cookie expires in 7 days,
+                // but the fact that it does is also encoded inside 
+                // of the token, so it can't be faked
                 .max_age(Duration::days(7));
 
             cookies.add_private(cookie);
