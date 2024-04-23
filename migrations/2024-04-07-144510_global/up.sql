@@ -47,6 +47,7 @@ CREATE TABLE "roles" (
 	"id" SERIAL NOT NULL,
 	"guild_id" INT4 NOT NULL,
     "name" VARCHAR NOT NULL,
+	"color" VARCHAR(7) NOT NULL,
 	PRIMARY KEY ("id"),
     FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
 );

@@ -10,6 +10,9 @@ pub use channel_permissions::*;
 mod guilds;
 pub use guilds::*;
 
+mod color;
+pub use color::*;
+
 mod database;
 pub use database::*;
 

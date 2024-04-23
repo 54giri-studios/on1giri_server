@@ -71,6 +71,8 @@ diesel::table! {
         id -> Int4,
         guild_id -> Int4,
         name -> Varchar,
+        #[max_length = 7]
+        color -> Varchar,
     }
 }
 
