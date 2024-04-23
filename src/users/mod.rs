@@ -13,19 +13,16 @@ use crate::{AccessLevel, DbPool, User, UserMetadata};
 pub async fn setup(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
     let mut connection = pool.get().await?;
 
-
     use crate::schema::access_levels::dsl as al_dsl;
 
     let levels = [AccessLevel::admin(), AccessLevel::regular()];
 
-    for lv in levels {
-        diesel::insert_into(al_dsl::access_levels)
-            .values(&lv)
-            .on_conflict(al_dsl::level)
-            .do_nothing()
-            .execute(&mut connection)
-            .await?;
-    }
+    diesel::insert_into(al_dsl::access_levels)
+        .values(&levels)
+        .on_conflict(al_dsl::level)
+        .do_nothing()
+        .execute(&mut connection)
+        .await?;
 
     Ok(())
 }
