@@ -159,5 +159,110 @@ pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error
         .execute(&mut conn)
         .await?;
 
+    let overseer = User::new(
+        1,
+        var("OVERSEER_PASSWORD").expect("OVERSEER_PASSWORD must be set"),
+        AccessLevel::admin().to_string(),
+        var("OVERSEER_EMAIL").expect("OVERSEER_EMAIL must be set"),
+    );
+
+    diesel::insert_into(u_dsl::users)
+        .values(&overseer)
+        .on_conflict(u_dsl::id)
+        .do_update()
+        .set(&overseer)
+        .execute(&mut conn)
+        .await?;
+
+    // UserMetadata
+    let overseer_metadata = UserMetadata::new(
+        1,
+        var("OVERSEER_USERNAME").expect("OVERSEER_USERNAME must be set"),
+        var("OVERSEER_DISCRIMINATOR")
+            .expect("OVERSEER_DICRIMINATOR must be set")
+            .parse()
+            .expect("OVERSEER_DISCRIMINATOR must be a valid i16 between 0000 and 9999"),
+        DateTime::from_timestamp(
+            var("OVERSEER_LAST_CHECK_IN")
+                .expect("OVERSEER_LAST_CHECK_IN must be set")
+                .parse()
+                .expect("OVERSEER_LAST_CHECK_IN must be a valid timestamp"), 
+            0
+        ).expect("OVERSEER_LAST_CHECK_IN must be a valid timestamp"),
+        var("OVERSEER_PICTURE").expect("OVERSEER_PICTURE must be set"),
+        DateTime::from_timestamp(
+            var("OVERSEER_ACCOUNT_CREATION")
+                .expect("OVERSEER_ACCOUNT_CREATION must be set")
+                .parse()
+                .expect("OVERSEER_ACCOUNT_CREATION must be a valid timestamp"), 
+            0
+        ).expect("OVERSEER_ACCOUNT_CREATION must be a valid timestamp"),
+        var("OVERSEER_DESCRIPTION").expect("OVERSEER_DESCRIPTION must be set"),
+    );
+
+    diesel::insert_into(um_dsl::users_metadata)
+        .values(&overseer_metadata)
+        .on_conflict(um_dsl::id)
+        .do_update()
+        .set(&overseer_metadata)
+        .execute(&mut conn)
+        .await?;
+
+    // Make the overseer part of the guild
+    let overseer_member = Member::new(1, 0);
+    diesel::insert_into(m_dsl::members)
+        .values(&overseer_member)
+        .on_conflict((m_dsl::user_id, m_dsl::guild_id))
+        .do_update()
+        .set(&overseer_member)
+        .execute(&mut conn)
+        .await;
+
+    diesel::insert_into(c_dsl::channels)
+        .values(&system_channel)
+        .on_conflict(c_dsl::id)
+        .do_update()
+        .set(&system_channel)
+        .execute(&mut conn)
+        .await?;
+
+    // Supreme overseer role
+    let supreme_overseer = Role::new(
+        1,
+        0,
+        var("OVERSEER_ROLE_NAME").expect("overseer_ROLE_NAME must be set "),
+
+        Color::from_hex(var("OVERSEER_ROLE_COLOR").expect("overseer_ROLE_COLOR must be set"))
+            .expect("OVERSEER_ROLE_COLOR must be a valid hex color")
+            .to_hex_string()
+    );
+
+    diesel::insert_into(r_dsl::roles)
+        .values(&supreme_overseer)
+        .on_conflict(r_dsl::id)
+        .do_update()
+        .set(&supreme_overseer)
+        .execute(&mut conn)
+        .await?;
+
+    // Attribute that role to the overseer
+    let overseer_role = MemberRole::new(1, 0, 1);
+
+    diesel::insert_into(mr_dsl::members_roles)
+        .values(&overseer_role)
+        .on_conflict_do_nothing()
+        .execute(&mut conn)
+        .await?;
+
+    // Give her no rights for testing purposes
+    let overseer_role_permissions = ChannelPermissions::nothing_allowed(1, 0, 0);
+    diesel::insert_into(cp_dsl::channel_permissions)
+        .values(&overseer_role_permissions)
+        .on_conflict((cp_dsl::role_id, cp_dsl::guild_id, cp_dsl::channel_id))
+        .do_update()
+        .set(&overseer_role_permissions)
+        .execute(&mut conn)
+        .await?;
+
     Ok(())
 }

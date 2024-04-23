@@ -25,6 +25,10 @@ impl ChannelPermissions {
     pub fn all_allowed(role_id: i32, guild_id: i32, channel_id: i32) -> Self {
         Self { role_id, guild_id, channel_id, can_read: true, can_write: true }
     }
+
+    pub fn nothing_allowed(role_id: i32, guild_id: i32, channel_id: i32) -> Self {
+        Self { role_id, guild_id, channel_id, can_read: false, can_write: false }
+    }
 }
 #[derive(Debug, Serialize)]
 pub struct PopulatedChannelPermissions {
