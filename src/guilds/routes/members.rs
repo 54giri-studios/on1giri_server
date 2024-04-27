@@ -90,7 +90,11 @@ pub async fn get_guild_members(
 
         let maybe_roles: Result<Vec<Role>, _> = r::roles
             .filter(r::guild_id.eq(guild_id))
-            .inner_join(mr::members_roles)
+            .inner_join(mr::members_roles.on(
+                mr::role_id.eq(r::id)
+                .and(mr::guild_id.eq(r::guild_id))
+            ))
+            .filter(mr::member_id.eq(member.user_id()))
             .select(Role::as_select())
             .get_results(&mut conn)
             .await;
