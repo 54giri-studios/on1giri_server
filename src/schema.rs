@@ -73,6 +73,13 @@ diesel::table! {
         name -> Varchar,
         #[max_length = 7]
         color -> Varchar,
+        category -> Varchar,
+    }
+}
+
+diesel::table! {
+    roles_category (category) {
+        category -> Varchar,
     }
 }
 
@@ -122,6 +129,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     members_roles,
     messages,
     roles,
+    roles_category,
     users,
     users_metadata,
 );

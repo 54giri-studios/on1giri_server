@@ -15,6 +15,10 @@ impl Member {
     pub fn new(user_id: i32, guild_id: i32) -> Self {
         Self { user_id, guild_id }
     }
+
+    pub fn user_id(&self) -> i32 {
+        self.user_id
+    }
 }
 
 #[derive(Debug, Serialize)]

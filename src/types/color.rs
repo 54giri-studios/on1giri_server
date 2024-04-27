@@ -35,4 +35,12 @@ impl Color {
     pub fn to_hex_string(&self) -> String {
         format!("#{:02X}{:02X}{:02X}", self.red, self.green, self.blue)
     }
+
+    pub fn default_role_color() -> Self {
+        Self::new(211, 211, 211)
+    }
+
+    pub fn owner_role_color() -> Self {
+        Self::new(255, 255, 255)
+    }
 }

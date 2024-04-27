@@ -43,7 +43,7 @@ pub struct Guild {
     pub name: String,
     /// Its owner's id.
     /// Must refer to an actual [crate::User]
-    pub owner_id: i32,
+    owner_id: i32,
     /// A short description telling what kind of activities
     /// is done in this guild
     pub description: String,
@@ -55,6 +55,15 @@ impl Guild {
     pub fn new(id: i32, name: String, owner_id: i32, description: String, creation_date: DateTime<Utc>) -> Self {
         Self { id, name, owner_id, description, creation_date }
     }
+
+    pub fn id(&self) -> i32 {
+        self.id
+    }
+
+    pub fn owner_id(&self) -> i32 {
+        self.owner_id
+    }
+
 }
 
 #[derive(Debug, Serialize)]

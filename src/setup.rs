@@ -2,7 +2,7 @@ use chrono::DateTime;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 
-use crate::{AccessLevel, Channel, ChannelKind, ChannelPermissions, Color, DbPool, Guild, Member, MemberRole, Role, User, UserMetadata};
+use crate::{AccessLevel, Channel, ChannelKind, ChannelPermissions, Color, DbPool, Guild, Member, MemberRole, Role, RoleCategory, User, UserMetadata};
 
 use std::env::var;
 
@@ -129,7 +129,8 @@ pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error
 
         Color::from_hex(var("OVERLORD_ROLE_COLOR").expect("OVERLORD_ROLE_COLOR must be set"))
             .expect("OVERLORD_ROLE_COLOR must be a valid hex color")
-            .to_hex_string()
+            .to_hex_string(),
+        RoleCategory::owner().to_string(),
     );
 
     diesel::insert_into(r_dsl::roles)
@@ -234,7 +235,8 @@ pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error
 
         Color::from_hex(var("OVERSEER_ROLE_COLOR").expect("overseer_ROLE_COLOR must be set"))
             .expect("OVERSEER_ROLE_COLOR must be a valid hex color")
-            .to_hex_string()
+            .to_hex_string(),
+        RoleCategory::standard().to_string(),
     );
 
     diesel::insert_into(r_dsl::roles)

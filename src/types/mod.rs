@@ -34,6 +34,9 @@ pub use response::*;
 mod roles;
 pub use roles::*;
 
+mod roles_category;
+pub use roles_category::*;
+
 mod users;
 pub use users::*;
 

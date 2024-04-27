@@ -43,11 +43,16 @@ CREATE TABLE "members" (
 	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
 );
 
+CREATE TABLE "roles_category" (
+	"category" VARCHAR NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE "roles" (
 	"id" SERIAL NOT NULL,
 	"guild_id" INT4 NOT NULL,
     "name" VARCHAR NOT NULL,
 	"color" VARCHAR(7) NOT NULL,
+	"category" VARCHAR NOT NULL,
 	PRIMARY KEY ("id"),
     FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
 );
