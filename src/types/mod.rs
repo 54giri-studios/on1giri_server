@@ -16,6 +16,9 @@ pub use color::*;
 mod database;
 pub use database::*;
 
+mod errors;
+pub use errors::*;
+
 mod login;
 pub use login::*;
 

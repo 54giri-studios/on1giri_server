@@ -24,7 +24,7 @@ pub struct Channel {
     pub id: i32,
     /// The guild's id that it belongs to
     /// Must refer to an actual [crate::Guild]
-    pub guild_id: i32,
+    guild_id: i32,
     /// It's display name
     pub name: String,
     /// The kind of the channel
@@ -35,6 +35,14 @@ pub struct Channel {
 impl Channel {
     pub fn new(id: i32, guild_id: i32, name: String, kind: String) -> Self {
         Self { id, guild_id, name, kind }
+    }
+
+    pub fn id(&self) -> i32 {
+        self.id
+    }
+
+    pub fn guild_id(&self) -> i32 {
+        self.guild_id
     }
 }
 

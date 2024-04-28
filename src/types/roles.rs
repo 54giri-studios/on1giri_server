@@ -30,7 +30,7 @@ impl NewRole {
         let owner_role_category = RoleCategory::owner().to_string();
         let owner_role_color = Color::owner_role_color().to_hex_string();
 
-        Self::new(guild_id, owner_role_category.clone(), owner_role_category.clone(), owner_role_category)
+        Self::new(guild_id, owner_role_category.clone(), owner_role_color.clone(), owner_role_category)
 
     }
 }
@@ -54,5 +54,21 @@ impl Role {
 
     pub fn id(&self) -> i32 {
         self.id
+    }
+
+    pub fn guild_id(&self) -> i32 {
+        self.guild_id
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn color(&self) -> &str {
+        &self.color
+    }
+
+    pub fn category(&self) -> &str {
+        &self.category
     }
 }
