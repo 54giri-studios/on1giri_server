@@ -10,19 +10,12 @@ use std::collections::HashMap;
 use rocket::tokio::sync::Mutex;
 
 mod channels;
-
 mod guilds;
-
-mod login;
-
+mod auth;
 mod members;
-
 mod messages;
-
 mod roles;
-
 mod setup;
-
 mod users;
 
 mod types;
@@ -73,9 +66,8 @@ async fn rocket() -> _ {
     }
 
     if let Err(err) = setup::setup_system(&pool).await {
-        panic!("Error setting up roles {err}");
+        panic!("Error setting up system {err}");
     }
-
 
     let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));
@@ -89,7 +81,7 @@ async fn rocket() -> _ {
         .mount("/channels/", channels::routes())
         .mount("/gateway/", gateway::routes())
         .mount("/guilds/", guilds::routes())
-        .mount("/login/", login::routes())
+        .mount("/auth/", auth::routes())
         .mount("/messages/", messages::routes())
         .mount("/users/", users::routes())
 }

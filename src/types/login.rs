@@ -1,7 +1,7 @@
 use base64::prelude::*;
 use chrono::{DateTime, MappedLocalTime, TimeDelta, TimeZone, Utc};
 use hex::FromHexError;
-use ring::{hmac, rand::{SecureRandom, SystemRandom}};
+use ring::{hmac, rand::{self, RandomlyConstructable, SecureRandom, SystemRandom}};
 use rocket::http::Status;
 
 use crate::UserMetadata;

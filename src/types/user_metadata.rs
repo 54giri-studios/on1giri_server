@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use diesel::prelude::*;
 use chrono::{DateTime, Utc};
 
@@ -7,7 +9,7 @@ use chrono::{DateTime, Utc};
 pub struct UserMetadata {
     pub id: i32,
     pub username: String,
-    pub discriminator: i16,
+    pub discriminator: i32,
     pub last_check_in: DateTime<Utc>,
     pub picture: String,
     pub account_creation: DateTime<Utc>,
@@ -22,7 +24,7 @@ impl UserMetadata {
     pub fn new(
         id: i32,
         username: String,
-        discriminator: i16,
+        discriminator: i32,
         last_check_in: DateTime<Utc>,
         picture: String,
         account_creation: DateTime<Utc>,
@@ -32,4 +34,33 @@ impl UserMetadata {
     }
 }
 
+#[derive(Debug, Deserialize, Insertable)]
+#[diesel(table_name = crate::schema::users_metadata)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct InitialUserMetadata<'a> {
+    id: i32,
+    username: Cow<'a, str>,
+    picture: Cow<'a, str>,
+    description: Cow<'a, str>,
+}
 
+impl<'a> InitialUserMetadata<'a> {
+    pub fn new(id: i32, username: &'a str, picture: &'a str, description: &'a str) -> Self {
+        Self { 
+            id, 
+            username: username.into(), 
+            picture: picture.into(), 
+            description: description.into(), 
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, AsChangeset, Insertable)]
+#[diesel(table_name = crate::schema::users_metadata)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct PatchUserMetadata<'a> {
+    username: Option<Cow<'a, str>>,
+    discriminator: Option<i32>,
+    picture: Option<Cow<'a, str>>,
+    description: Option<Cow<'a, str>>
+}

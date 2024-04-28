@@ -93,10 +93,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    users_metadata (id) {
+    users_metadata (username, discriminator) {
         id -> Int4,
         username -> Varchar,
-        discriminator -> Int2,
+        discriminator -> Int4,
         last_check_in -> Timestamptz,
         picture -> Text,
         account_creation -> Timestamptz,

@@ -10,18 +10,19 @@ CREATE TABLE "users"(
 	"id" SERIAL PRIMARY KEY,
 	"password" VARCHAR NOT NULL,
 	"access_level" VARCHAR NOT NULL,
-	"email" VARCHAR NOT NULL,
+	"email" VARCHAR NOT NULL UNIQUE,
     FOREIGN KEY ("access_level") REFERENCES "access_levels" ("level")
 );
 
 CREATE TABLE "users_metadata"(
-	"id" SERIAL PRIMARY KEY,
+	"id" INT4 NOT NULL,
 	"username" VARCHAR NOT NULL,
-	"discriminator" INT2 NOT NULL,
-	"last_check_in" TIMESTAMPTZ NOT NULL,
+	"discriminator" SERIAL NOT NULL,
+	"last_check_in" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"picture" TEXT NOT NULL,
-	"account_creation" TIMESTAMPTZ NOT NULL,
+	"account_creation" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"description" TEXT NOT NULL,
+    PRIMARY KEY ("username", "discriminator"),
     FOREIGN KEY ("id") REFERENCES "users" ("id")
 );
 

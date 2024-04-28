@@ -19,8 +19,7 @@ impl NewRole {
         Self { guild_id, name, color, category }
     }
 
-    pub fn standard(guild_id: i32) -> Self {
-
+    pub fn everyone(guild_id: i32) -> Self {
         let default_role_category = RoleCategory::everyone().to_string();
         let default_role_color = Color::default_role_color().to_hex_string();
 

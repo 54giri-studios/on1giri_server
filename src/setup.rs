@@ -65,7 +65,7 @@ pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error
 
     diesel::insert_into(um_dsl::users_metadata)
         .values(&overlord_metadata)
-        .on_conflict(um_dsl::id)
+        .on_conflict((um_dsl::username, um_dsl::discriminator))
         .do_update()
         .set(&overlord_metadata)
         .execute(&mut conn)
@@ -203,7 +203,7 @@ pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error
 
     diesel::insert_into(um_dsl::users_metadata)
         .values(&overseer_metadata)
-        .on_conflict(um_dsl::id)
+        .on_conflict((um_dsl::username, um_dsl::discriminator))
         .do_update()
         .set(&overseer_metadata)
         .execute(&mut conn)

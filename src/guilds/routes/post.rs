@@ -42,7 +42,7 @@ pub async fn post_guild(
                 .await?;
 
             let default_role: Role = diesel::insert_into(r_dsl::roles)
-                .values(NewRole::standard(guild.id()))
+                .values(NewRole::everyone(guild.id()))
                 .returning(Role::as_returning())
                 .get_result(conn)
                 .await?;
@@ -57,12 +57,13 @@ pub async fn post_guild(
                 .returning(Role::as_returning())
                 .get_result(conn)
                 .await?;
+
             diesel::insert_into(mr_dsl::members_roles)
                 .values(MemberRole::new(owner_role.id(), guild.id(), owner.user_id()))
                 .execute(conn)
                 .await?;
 
-            Ok::<_, diesel::result::Error>(guild)
+            Ok(guild)
         }.scope_boxed()
     ).await;
 

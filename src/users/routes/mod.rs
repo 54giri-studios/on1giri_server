@@ -16,6 +16,7 @@ use rocket::Route;
 pub fn routes() -> Vec<Route> {
     let mut routes = routes![
         guilds::get_guilds,
+        patch::patch_user,
     ];
     routes.extend(routes![delete_by_id]);
     routes.extend(routes![get_by_id]);
