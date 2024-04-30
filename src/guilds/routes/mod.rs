@@ -24,6 +24,7 @@ pub use roles::*;
 pub fn routes() -> Vec<Route> {
     let routes = routes![
         guilds::get_guild,
+        guilds::patch_guild,
         roles::get_guild_roles,
         channels::get_guild_channels,
         members::get_guild_member,

@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use rocket::{serde::json::Json, State};
 
-use crate::{Channel, DbPool, ErrorResponse, Guild, JsonResponse, PopulatedGuild, Role, UserMetadata};
+use crate::{Channel, DbPool, ErrorResponse, Guild, JsonResponse, PatchGuild, PopulatedGuild, Role, UserMetadata};
 
 use crate::schema::{
     channels::dsl as c,
@@ -40,4 +40,24 @@ pub async fn get_guild(
     let populated_guild = PopulatedGuild::new(guild, owner, roles, channels);
 
     Ok(populated_guild.into())
+}
+
+#[patch("/<guild_id>", data = "<guild_patch>", format = "json")]
+pub async fn patch_guild<'a>(
+    pool: &State<DbPool>,
+    guild_id: i32,
+    guild_patch: Json<PatchGuild<'a>>
+) -> JsonResponse<PopulatedGuild> {
+    let mut conn = match pool.get().await {
+        Ok(c) => c,
+        Err(err) => return Err(ErrorResponse::internal_error(err).into())
+    };
+
+    let a = diesel::update(g::guilds)
+        .filter(g::id.eq(guild_id))
+        .set(guild_patch.into_inner())
+        .execute(&mut conn)
+        .await;
+
+    get_guild(pool, guild_id).await
 }

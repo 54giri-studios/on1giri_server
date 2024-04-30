@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, sql_types::Date};
 
@@ -49,6 +51,15 @@ pub struct Guild {
     pub description: String,
     /// When it was created for the first time
     pub creation_date: DateTime<Utc>
+}
+
+#[derive(Debug, AsChangeset, Insertable, Deserialize)]
+#[diesel(table_name = crate::schema::guilds)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct PatchGuild<'a> {
+    name: Option<Cow<'a, str>>,
+    owner_id: Option<i32>,
+    description: Option<Cow<'a, str>>,
 }
 
 impl Guild {
