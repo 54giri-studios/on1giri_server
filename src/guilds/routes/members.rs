@@ -1,8 +1,15 @@
 use diesel::prelude::*;
-use diesel_async::RunQueryDsl;
+use diesel::result::{
+    Error as DieselError,
+    DatabaseErrorKind,
+};
+use diesel_async::{scoped_futures::ScopedFutureExt, RunQueryDsl};
+
+use rocket::http::Status;
 use rocket::{serde::json::Json, State};
 
-use crate::{DbPool, ErrorResponse, Guild, JsonResponse, Member, PopulatedMember, Role, User, UserMetadata};
+use crate::{MemberRole, RoleCategory};
+use crate::{DbPool, ErrorResponse, Guild, JsonResponse, Member, PopulatedGuild, PopulatedMember, Role, User, UserMetadata};
 
 use crate::schema::{
     users_metadata::dsl as um,
@@ -111,4 +118,75 @@ pub async fn get_guild_members(
     }
 
     Ok(populated_members.into())
+}
+
+#[post("/<guild_id>/members/<member_id>/create")]
+pub async fn post_guild_member(
+    pool: &State<DbPool>,
+    guild_id: i32,
+    member_id: i32
+) -> JsonResponse<PopulatedMember> {
+    let mut conn = match pool.get().await {
+        Ok(c) => c,
+        Err(err) => return Err(ErrorResponse::internal_error(err).into())
+    };
+
+    let maybe_pop_member: Result<PopulatedMember, ErrorResponse> = conn
+        .build_transaction()
+        .serializable()
+        .run(move |conn| async move {
+            let member: Member = Member::new(member_id, guild_id);
+            diesel::insert_into(m::members)
+                .values(&member)
+                .execute(conn)
+                .await
+                .map_err(|err| match err {
+                    DieselError::DatabaseError(DatabaseErrorKind::ForeignKeyViolation, info) => {
+                        ErrorResponse::new(
+                            Status::BadRequest, 
+                            format!("One of the provided ids is invalid: {info:?}")
+                        )
+                    },
+                    other => ErrorResponse::internal_error(other)
+                })?;
+
+            let guild: Guild = g::guilds
+                .filter(g::id.eq(member.guild_id))
+                .get_result(conn)
+                .await
+                .map_err(ErrorResponse::from)?;
+
+            let default_role: Role = r::roles
+                .filter(r::guild_id.eq(guild.id()))
+                .filter(r::category.eq(RoleCategory::everyone().to_string()))
+                .get_result(conn)
+                .await
+                .map_err(ErrorResponse::from)?;
+
+            diesel::insert_into(mr::members_roles)
+                .values(MemberRole::new(default_role.id(), guild.id(), member.user_id()))
+                .execute(conn)
+                .await
+                .map_err(ErrorResponse::from)?;
+
+            let user_meta: UserMetadata = um::users_metadata
+                .filter(um::id.eq(member.user_id()))
+                .get_result(conn)
+                .await
+                .map_err(ErrorResponse::from)?;
+
+            let pop_member: PopulatedMember = PopulatedMember::new(
+                user_meta,
+                guild,
+                vec![default_role],
+            );
+
+            Ok(pop_member)
+        }.scope_boxed())
+        .await;
+
+    match maybe_pop_member {
+        Ok(pm) => Ok(pm.into()),
+        Err(err) => Err(err.into())
+    }
 }

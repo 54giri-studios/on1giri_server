@@ -7,7 +7,7 @@ use chrono::TimeDelta;
 use diesel_async::pooled_connection::deadpool::{BuildError, Pool};
 use std::collections::HashMap;
 
-use rocket::tokio::sync::Mutex;
+use rocket::{local::asynchronous::Client, tokio::sync::Mutex};
 
 mod channels;
 mod guilds;
@@ -65,12 +65,14 @@ async fn rocket() -> _ {
         panic!("Error setting up roles {err}");
     }
 
-    if let Err(err) = setup::setup_system(&pool).await {
-        panic!("Error setting up system {err}");
-    }
-
     let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));
+
+    /*
+    if let Err(err) = setup::setup_system(&pool, &token_handler).await {
+        panic!("Error setting up system {err}");
+    }
+    */
 
     rocket::build()
         .manage(pool)
@@ -84,4 +86,5 @@ async fn rocket() -> _ {
         .mount("/auth/", auth::routes())
         .mount("/messages/", messages::routes())
         .mount("/users/", users::routes())
+
 }

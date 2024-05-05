@@ -1,8 +1,9 @@
 use chrono::DateTime;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
+use rocket::{http::CookieJar, local::asynchronous::Client};
 
-use crate::{AccessLevel, Channel, ChannelKind, ChannelPermissions, Color, DbPool, Guild, Member, MemberRole, Role, RoleCategory, User, UserMetadata};
+use crate::{AccessLevel, Channel, ChannelKind, ChannelPermissions, Color, DbPool, Guild, Member, MemberRole, Role, RoleCategory, TokenHandler, User, UserMetadata};
 
 use std::env::var;
 
@@ -17,9 +18,8 @@ use crate::schema::{
     users_metadata::dsl as um_dsl,
 };
 
-pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error>> {
-
-    let mut conn = pool.get().await?;
+/*
+pub async fn setup_system(pool: &DbPool, token_handler: &TokenHandler) -> Result<(), Box<dyn std::error::Error>> {
 
     // User
     let overlord = User::new(
@@ -268,3 +268,4 @@ pub async fn setup_system(pool: &DbPool) -> Result<(), Box<dyn std::error::Error
 
     Ok(())
 }
+*/

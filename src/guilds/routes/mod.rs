@@ -27,8 +27,10 @@ pub fn routes() -> Vec<Route> {
         guilds::patch_guild,
         roles::get_guild_roles,
         channels::get_guild_channels,
+
         members::get_guild_member,
         members::get_guild_members,
+        members::post_guild_member,
 
         permissions::get_guild_channel_permissions,
         permissions::get_guild_channel_role_permissions,
