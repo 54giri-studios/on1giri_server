@@ -43,6 +43,16 @@ impl<'a> InsertableMessage<'a> {
             creation_date: Utc::now(),
         }
     }
+
+    pub fn channel_id(&self) -> i32 {
+        self.channel_id
+        
+    }
+
+    pub fn author_id(&self) -> i32 {
+        self.author_id
+    }
+
 }
 
 /// Represents a messaged that was retrieved from the database.

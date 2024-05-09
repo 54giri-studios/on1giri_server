@@ -48,7 +48,7 @@ impl Channel {
 
 /// An enum like defining a [Channel]'s kind.
 /// Mirrors [crate::schema::channel_kinds]
-#[derive(Debug, Insertable, Selectable, Serialize)]
+#[derive(Debug, Insertable, Selectable, Serialize, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::channel_kinds)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ChannelKind {
