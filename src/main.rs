@@ -3,11 +3,16 @@
 #[macro_use] extern crate rocket;
 
 
+use base64::{prelude::BASE64_STANDARD, Engine};
 use chrono::TimeDelta;
 use diesel_async::pooled_connection::deadpool::{BuildError, Pool};
 use std::collections::HashMap;
 
-use rocket::{local::asynchronous::Client, tokio::sync::Mutex};
+use rocket::{
+    config::{Config, SecretKey},
+    local::asynchronous::Client, 
+    tokio::sync::Mutex, 
+};
 
 mod channels;
 mod guilds;
@@ -68,13 +73,14 @@ async fn rocket() -> _ {
     let token_handler = TokenHandler::new(TimeDelta::days(7))
         .unwrap_or_else(|| panic!("Failed to generate the token handler"));
 
-    /*
-    if let Err(err) = setup::setup_system(&pool, &token_handler).await {
-        panic!("Error setting up system {err}");
-    }
-    */
 
-    rocket::build()
+    let mut buff = [0; 64];
+    token_handler.fill_nonce(&mut buff);
+
+    let figment = rocket::Config::figment()
+        .merge(("secret_key", BASE64_STANDARD.encode(buff)));
+
+    rocket::custom(figment)
         .manage(pool)
         .manage(token_handler)
         .manage(AppState {

@@ -184,6 +184,9 @@ impl TokenHandler {
     }
 
     pub fn fill_nonce(&self, data: &mut [u8]) {
+        // It's fine to crash if that one dies out
+        // Since the security of the whole app
+        // is compromised if it does
         self.rng.fill(data).unwrap();
     }
 
