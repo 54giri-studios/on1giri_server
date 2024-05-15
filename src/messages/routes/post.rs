@@ -127,7 +127,7 @@ pub async fn post_message<'a>(
     };
 
     // Sending the message down the channel for other users to receive
-    let channel_msg = ChannelMessage::new(insertable_message);
+    let channel_msg = ChannelMessage::new(&message);
     let mut chat_sessions = chat_sessions.clients.lock().await;
 
     let message = json::json!(message);

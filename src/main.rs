@@ -38,7 +38,14 @@ fn establish_db_connection() -> Result<DbPool, BuildError> {
             .unwrap_or_else(|_| panic!("DATABASE_URL env var must be set")),
     );
 
-    Pool::builder(config).build()
+    Pool::builder(config)
+        .max_size(
+            std::env::var("DB_POOL_SIZE")
+                .expect("DB_POOL_SIZE env var must be set")
+                .parse::<usize>()
+                .expect("DB_POOL_SIZE env var must be a whole number")
+            )
+        .build()
 }
 
 #[launch]

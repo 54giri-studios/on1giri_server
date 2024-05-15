@@ -102,6 +102,7 @@ pub enum MessageType {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct ChannelMessage {
+    pub id: i32,
     pub channel_id: i32,
     pub message_type: MessageType,
     pub content: String,
@@ -110,11 +111,12 @@ pub struct ChannelMessage {
 }
 
 impl ChannelMessage {
-    pub fn new(msg: InsertableMessage) -> Self {
+    pub fn new(msg: &Message) -> Self {
         Self {
+            id: msg.id,
             channel_id: msg.channel_id,
             author_id: msg.author_id,
-            content: msg.content.into(),
+            content: msg.content.to_string(),
             message_type: MessageType::SEND,
             creation_date: msg.creation_date,
         }

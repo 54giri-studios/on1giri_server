@@ -147,6 +147,12 @@ pub async fn post_guild_member(
                             format!("One of the provided ids is invalid: {info:?}")
                         )
                     },
+                    DieselError::DatabaseError(DatabaseErrorKind::UniqueViolation, info) => {
+                        ErrorResponse::new(
+                            Status::Conflict,
+                            format!("User {} is already a member of guild {}", member_id, guild_id)
+                        )
+                    },
                     other => ErrorResponse::internal_error(other)
                 })?;
 
